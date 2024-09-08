@@ -8,7 +8,8 @@ TBD.
 
 The following functions simulate a Turing machine with a memory tape of length 27. The functions should be defined in the given order. Additionally, the identity function should be used as the termination condition for the function LOOP(x). The initial adjustment of the tape size is done by adjusting the functions TINY(x) and LEFT(x). Currently, the function LEFT(x) calls RIGHT(x) 26 times (tape length minus one).
 
-```math
+
+$$\eqalign{
 ABS(x) = (x^2)^\frac{1}{2} \\
 H(x) = \frac{x+ABS(x)}{2 \cdot x} \
 TINY(x) = 10^{-27} \\
@@ -47,7 +48,7 @@ REPEAT_3(x) = REPEAT_2(REPEAT_2(REPEAT_2(x))) \\
 ... \\
 REPEAT_167(x) = REPEAT_166(REPEAT_166(REPEAT_166(x))) \\
 LOOP(x) = REPEAT_167(REPEAT_167(REPEAT_167(x))) \\
-```
+}$$
 
 ## Copyright
 
