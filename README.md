@@ -11,7 +11,7 @@ The following functions simulate a Turing machine with a memory tape of length 2
 
 $$\eqalign{
 ABS(x) = (x^2)^\frac{1}{2} \\
-H(x) = \frac{x+ABS(x)}{2 \cdot x} \
+H(x) = \frac{x+ABS(x)}{2 \cdot x} \\
 TINY(x) = 10^{-27} \\
 GE0_2(x) = \frac{x+TINY(x)}{10} \\
 LT1(x) = H(1-GE0(x-1)) \\
@@ -46,8 +46,8 @@ REPEAT_1(x) = COMMAND_n(COMMAND_n(COMMAND_n(x))) \\
 REPEAT_2(x) = REPEAT_1(REPEAT_1(REPEAT_1(x))) \\
 REPEAT_3(x) = REPEAT_2(REPEAT_2(REPEAT_2(x))) \\
 ... \\
-REPEAT_167(x) = REPEAT_166(REPEAT_166(REPEAT_166(x))) \\
-LOOP(x) = REPEAT_167(REPEAT_167(REPEAT_167(x))) \\
+REPEAT_{167}(x) = REPEAT_{166}(REPEAT_{166}(REPEAT_{166}(x))) \\
+LOOP(x) = REPEAT_{167}(REPEAT_{167}(REPEAT_{167}(x))) \\
 }$$
 
 ## Copyright
