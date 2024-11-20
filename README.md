@@ -5,130 +5,130 @@
 Algebraic functions for the simulation of a Turing machine with d memory cells:
 
 $$
-ABS(x) = (x^2)^\frac{1}{2}
+abs(x) = (x^2)^\frac{1}{2}
 $$
 $$
-H(x) = \frac{x+ABS(x)}{2 \cdot x}
+H(x) = \frac{x+abs(x)}{2 \cdot x}
 $$
 $$
-TINY(x) = 10^{-d}
+tiny(x) = 10^{-d}
 $$
 $$
-GE0(x) = H(x + \frac{TINY(x)}{10})
+ge0(x) = H(x + \frac{tiny(x)}{10})
 $$
 $$
-LT1(x) = 1-GE0(x-1)
+lt1(x) = 1-ge0(x-1)
 $$
 $$
-\boldsymbol{IS0}(x) = GE0(x) \cdot LT1(x)
+\boldsymbol{is0}(x) = ge0(x) \cdot lt1(x)
 $$
 $$
-\boldsymbol{IS1}(x) = IS0(x - 1)
+\boldsymbol{is1}(x) = is0(x - 1)
 $$
 $$
-\boldsymbol{IS2}(x) = IS0(x - 2)
+\boldsymbol{is2}(x) = is0(x - 2)
 $$
 $$
-\boldsymbol{IS3}(x) = IS0(x - 3)
+\boldsymbol{is3}(x) = is0(x - 3)
 $$
 $$
-\boldsymbol{IS4}(x) = IS0(x - 4)
+\boldsymbol{is4}(x) = is0(x - 4)
 $$
 $$
-\boldsymbol{IS5}(x) = IS0(x - 5)
+\boldsymbol{is5}(x) = is0(x - 5)
 $$
 $$
-\boldsymbol{IS6}(x) = IS0(x - 6)
+\boldsymbol{is6}(x) = is0(x - 6)
 $$
 $$
-\boldsymbol{IS7}(x) = IS0(x - 7)
+\boldsymbol{is7}(x) = is0(x - 7)
 $$
 $$
-\boldsymbol{IS8}(x) = IS0(x - 8)
+\boldsymbol{is8}(x) = is0(x - 8)
 $$
 $$
-\boldsymbol{IS9}(x) = IS0(x - 9)
+\boldsymbol{is9}(x) = is0(x - 9)
 $$
 $$
-\boldsymbol{FLOOR1}(x) = IS1(x) + IS2(x) + IS3(x) + IS4(x) + IS5(x) + IS6(x) + IS7(x) + IS8(x) + IS9(x)
+\boldsymbol{floor1}(x) = is1(x) + is2(x) + is3(x) + is4(x) + is5(x) + is6(x) + is7(x) + is8(x) + is9(x)
 $$
 $$
-RIGHT_2(x) = FLOOR1(x \cdot 10)
+right_2(x) = floor1(x \cdot 10)
 $$
 $$
-\boldsymbol{RIGHT}(x) = x \cdot 10 - RIGHT_2(x) + RIGHT_2(x) \cdot TINY(x)
+\boldsymbol{right}(x) = x \cdot 10 - right_2(x) + right_2(x) \cdot tiny(x)
 $$
 $$
-LEFT_2(x) = RIGHT(RIGHT(x))
+left_2(x) = right(right(x))
 $$
 $$
-LEFT_3(x) = RIGHT(LEFT_2(x))
+left_3(x) = right(left_2(x))
 $$
 $$
-LEFT_4(x) = RIGHT(LEFT_3(x))
+left_4(x) = right(left_3(x))
 $$
 $$
 ...
 $$
 $$
-LEFT_{d-1}(x) = RIGHT(LEFT_{d-2}(x))
+left_{d-1}(x) = right(left_{d-2}(x))
 $$
 $$
-\boldsymbol{LEFT}(x) = LEFT_{d-1}(x)
+\boldsymbol{left}(x) = left_{d-1}(x)
 $$
 
-For each function COMMAND_1 to COMMAND_m, the following holds:  
-Let F be the set of all previously bolded functions and LOOP(x).  
+For each function command_1 to command_m, the following holds:  
+Let F be the set of all previously bolded functions and loop(x).  
 f_1, f_2, ..., f_n are arbitrary functions from F or other algebraic functions.  
 The functions can then be chained together.
 
 $$
-\boldsymbol{COMMAND_1}(x) = f_n( f_{n-1}( ... f_2(f_1(x)) ... ))
+\boldsymbol{command_1}(x) = f_n( f_{n-1}( ... f_2(f_1(x)) ... ))
 $$
 $$
-\boldsymbol{COMMAND_2}(x) = f_n( f_{n-1}( ... f_2(f_1(COMMAND_1(x))) ... ))
+\boldsymbol{command_2}(x) = f_n( f_{n-1}( ... f_2(f_1(command_1(x))) ... ))
 $$
 $$
-\boldsymbol{COMMAND_3}(x) = f_n( f_{n-1}( ... f_2(f_1(COMMAND_2(x))) ... ))
+\boldsymbol{command_3}(x) = f_n( f_{n-1}( ... f_2(f_1(command_2(x))) ... ))
 $$
 $$
 ...
 $$
 $$
-\boldsymbol{COMMAND_m}(x) = f_n( f_{n-1}( ... f_2(f_1(COMMAND_{m-1}(x))) ... ))
+\boldsymbol{command_m}(x) = f_n( f_{n-1}( ... f_2(f_1(command_{m-1}(x))) ... ))
 $$
 
 Let k be any number from 1 to including m
 
 $$
-REPEAT_1(x) = COMMAND_k(COMMAND_k(COMMAND_k(x)))
+repeat_1(x) = command_k(command_k(command_k(x)))
 $$
 $$
-REPEAT_2(x) = REPEAT_1(REPEAT_1(REPEAT_1(x)))
+repeat_2(x) = repeat_1(repeat_1(repeat_1(x)))
 $$
 $$
-REPEAT_3(x) = REPEAT_2(REPEAT_2(REPEAT_2(x)))
+repeat_3(x) = repeat_2(repeat_2(repeat_2(x)))
 $$
 $$
 ...
 $$
 $$
-REPEAT_{167}(x) = REPEAT_{166}(REPEAT_{166}(REPEAT_{166}(x)))
+repeat_{167}(x) = repeat_{166}(repeat_{166}(repeat_{166}(x)))
 $$
 $$
-\boldsymbol{LOOP_k}(x) = REPEAT_{167}(REPEAT_{167}(REPEAT_{167}(x)))
+\boldsymbol{loop_k}(x) = repeat_{167}(repeat_{167}(repeat_{167}(x)))
 $$
 
-## Round down more than one digit before the decimal point.
+## Round down more than one digit before the decimal point
 
 $$
-FLOOR2(x) = FLOOR1(\frac{x}{10}) \cdot 10 + FLOOR1(x - FLOOR1(\frac{x}{10}) \cdot 10)
+floor2(x) = floor1(\frac{x}{10}) \cdot 10 + floor1(x - floor1(\frac{x}{10}) \cdot 10)
 $$
 $$
-FLOOR4(x) = FLOOR2(\frac{x}{10^2}) \cdot 10^2 + FLOOR2(x - FLOOR2(\frac{x}{10^2}) \cdot 10^2)
+floor4(x) = floor2(\frac{x}{10^2}) \cdot 10^2 + floor2(x - floor2(\frac{x}{10^2}) \cdot 10^2)
 $$
 $$
-FLOOR8(x) = FLOOR4(\frac{x}{10^4}) \cdot 10^4 + FLOOR4(x - FLOOR4(\frac{x}{10^4}) \cdot 10^4)
+floor8(x) = floor4(\frac{x}{10^4}) \cdot 10^4 + floor4(x - floor4(\frac{x}{10^4}) \cdot 10^4)
 $$
 $$
 ...
