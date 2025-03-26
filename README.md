@@ -275,14 +275,14 @@ fn loop_a_function(mut x: f64, function: fn(f64) -> f64) -> f64 {
 
 fn main() {
     let x = 772.5530;
-    println!("f^[{}]({x}) = {}", u128::MAX, true_floor(x));
+    println!("true_floor^[{}]({x}) = {}", u128::MAX, true_floor(x));
 }
 ```
 
 Result:
 
 ```
-f^[340282366920938463463374607431768211455](772.553) = 772
+true_floor^[340282366920938463463374607431768211455](772.553) = 772
 ```
 
 ## Author
