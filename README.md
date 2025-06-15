@@ -4,7 +4,7 @@
 
 # Where is the source code
 
-The source is not online.
+The application's source code is not yet publicly available online. However, the source code may be published here in due course. In the meantime, this repository serves as a name reservation for [crates.io](http://crates.io) and functions as an FAQ resource. Additionally, bug reports may be filed here.
 
 # Routine
 
