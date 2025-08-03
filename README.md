@@ -1,4 +1,4 @@
-# Only-Algebraic-Functions
+# Single Variable Algebraic Language
 
 This page shows how _Only Algebraic Functions_ (OAF) are at least LOOP-complete and nearly Turing-complete. These algebraic functions operate exclusively with a single variable, numbers, additions, subtractions, multiplications, divisions and exponentiations.
 
