@@ -1,4 +1,4 @@
-_"single-variable-algebra" is a programming language designed by Armin Schäfer in 2024_
+_"single-variable-algebra" is a programming language designed by Armin Schäfer in 2024._
 
 [![Crate](https://img.shields.io/crates/v/single-variable-algebra-compiler.svg)](https://crates.io/crates/single-variable-algebra-compiler)
 
