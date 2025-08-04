@@ -1,8 +1,10 @@
+_"single-variable-algebra" is a programming language designed by Armin Schäfer in 2024_
+
 [![Crate](https://img.shields.io/crates/v/single-variable-algebra-compiler.svg)](https://crates.io/crates/single-variable-algebra-compiler)
 
 ## What is single-variable-algebra-compiler?
 
-"single-variable-algebra" is a programming language designed by Armin Schäfer in 2024. A compiler that is only using a single variable, numbers, additions, subtractions, multiplications, divisions, exponentiations and functions that are using the named things.
+This is a compiler that is only using a single variable, numbers, additions, subtractions, multiplications, divisions, exponentiations and functions that are using the named things.
 
 ## Usage
 
