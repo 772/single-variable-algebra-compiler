@@ -2,7 +2,7 @@
 
 ## What is single-variable-algebra-compiler?
 
-A compiler that is only using a single variable, numbers, additions, subtractions, multiplications, divisions, exponentiations and functions that are using the named things.
+"single-variable-algebra" is a programming language designed by Armin Schäfer in 2024. A compiler that is only using a single variable, numbers, additions, subtractions, multiplications, divisions, exponentiations and functions that are using the named things.
 
 ## Usage
 
@@ -290,7 +290,3 @@ Result:
 ```
 true_floor^[340282366920938463463374607431768211455](772.553) = 772
 ```
-
-## Author
-
-Copyright &copy; 2024 Armin Schäfer
