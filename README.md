@@ -1,8 +1,14 @@
-# Single Variable Algebraic Language
+[![Crate](https://img.shields.io/crates/v/single-variable-algebra-compiler.svg)](https://crates.io/crates/single-variable-algebra-compiler)
 
-This page shows how _Only Algebraic Functions_ (OAF) are at least LOOP-complete and nearly Turing-complete. These algebraic functions operate exclusively with a single variable, numbers, additions, subtractions, multiplications, divisions and exponentiations.
+## What is single-variable-algebra-compiler?
 
-## Functions
+A compiler that is only using a single variable, numbers, additions, subtractions, multiplications, divisions, exponentiations and functions that are using the named things.
+
+## Usage
+
+```cargo install single-variable-algebra-compiler```
+
+## Prooving Turing completeness
 
 Algebraic functions for the simulation of a Turing machine with d memory cells:
 
