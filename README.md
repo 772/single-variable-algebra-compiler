@@ -1,4 +1,4 @@
-_"single-variable-algebra" is a programming language designed by Armin Schäfer in 2024._
+_"single-variable-algebra" is a minimalistic programming language._
 
 [![Crate](https://img.shields.io/crates/v/single-variable-algebra-compiler.svg)](https://crates.io/crates/single-variable-algebra-compiler)
 
@@ -8,7 +8,43 @@ This is a compiler that is only using a single variable, numbers, additions, sub
 
 ## Usage
 
-```cargo install single-variable-algebra-compiler```
+- **Installed**: `single-variable-algebra-compiler <input>` (install via `cargo install single-variable-algebra-compiler`).
+- **From source**: `cargo r -- <input>` (after cloning this repository).
+
+Example input:
+
+```
+cargo r -- "
+DECIMAL_PLACES(x)=27
+ABS(x)=(x^2)^(1/2)
+H(x)=(x+ABS(x))/(2*x)
+TINY(x)=10^(-DECIMAL_PLACES(x))
+GE0(x)=H(x+TINY(x)/10)
+LT1(x)=1-GE0(x-1)
+IS0(x)=GE0(x)*LT1(x)
+IS1(x)=IS0(x-1)
+IS2(x)=IS0(x-2)
+IS3(x)=IS0(x-3)
+IS4(x)=IS0(x-4)
+IS5(x)=IS0(x-5)
+IS6(x)=IS0(x-6)
+IS7(x)=IS0(x-7)
+IS8(x)=IS0(x-8)
+IS9(x)=IS0(x-9)
+FLOOR1(x)=IS1(x)+2*IS2(x)+3*IS3(x)+4*IS4(x)+5*IS5(x)+6*IS6(x)+7*IS7(x)+8*IS8(x)+9*IS9(x)
+RIGHT(x)=x*10-FLOOR1(x*10)+FLOOR1(x*10)*TINY(x)
+LEFT(x)=RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(x))))))))))))))))))))))))))
+LEFT(0.300000000000000000000000012)
+"
+```
+
+Output: `0.230000000000000000000000001`
+
+> [!NOTE]
+> Some of the functions above contain performance optimizations. So using them is recommended.
+
+> [!WARNING]
+> Currently, it is not possible to overwrite `ALLOWED_DECIMAL_PLACES(x)=27`. In the next update, this will be possible.
 
 ## Prooving Turing completeness
 
@@ -129,22 +165,9 @@ $$
 \boldsymbol{loop_k}(x) = repeat_{167}(repeat_{167}(repeat_{167}(x)))
 $$
 
-## Round down more than one digit before the decimal point
+## Code examples without using the `dec` crate
 
-$$
-floor2(x) = floor1(\frac{x}{10}) \cdot 10 + floor1(x - floor1(\frac{x}{10}) \cdot 10)
-$$
-$$
-floor4(x) = floor2(\frac{x}{10^2}) \cdot 10^2 + floor2(x - floor2(\frac{x}{10^2}) \cdot 10^2)
-$$
-$$
-floor8(x) = floor4(\frac{x}{10^4}) \cdot 10^4 + floor4(x - floor4(\frac{x}{10^4}) \cdot 10^4)
-$$
-$$
-...
-$$
-
-Rust implementation of floor8(x):
+floor8(x) is able to round down bigger numbers:
 
 ```rust
 fn h(x: f64) -> f64 {
@@ -241,9 +264,7 @@ x = 99887766.12378      floor8(x) = 99887766
 x = 50000.1             floor8(x) = 50000  
 ```
 
-## How to handle loops or recursion
-
-Turing machines allow infinite loops. The identity function can be used as a termination condition to mimic loops.
+Turing machines allow infinite loops. The identity function can be used as a termination condition to mimic loops:
 
 ```rust
 fn h(x: f64) -> f64 {
@@ -292,3 +313,7 @@ Result:
 ```
 true_floor^[340282366920938463463374607431768211455](772.553) = 772
 ```
+
+## Trivia
+
+This programming language was designed in years of 2019, 2020 and 2024 by the author of this compiler. He wrote his Master Thesis about this.
