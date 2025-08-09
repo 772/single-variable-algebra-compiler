@@ -582,7 +582,7 @@ pub fn get_tasks() -> &'static Vec<TestCase> {
     })
 }
 
-mod math_trick {
+pub mod math_trick {
     use super::*;
 
     pub fn ge0(x: Dec) -> String {
