@@ -2,7 +2,7 @@
 name = "single-variable-algebra-compiler"
 version = "0.1.0"
 authors = ["Armin Schäfer"]
-description = "A compiler for the single-variable-algebra programming language"
+description = "A compiler for the minimalistic programming language single-variable-algebra."
 repository = "https://github.com/772/single-variable-algebra-compiler"
 readme = "README.md"
 license-file = "LICENSE"
