@@ -138,12 +138,7 @@ pub fn apply_algebra_to_tree_node(
                     .iter()
                     .find(|tablet| name == &tablet.name)
                     .unwrap_or_else(|| panic!("There is no tree called {name}"));
-                apply_algebra_to_tree_node(
-                    &tablet.root_node,
-                    &arg_value,
-                    tablets,
-                    use_math_tricks,
-                )
+                apply_algebra_to_tree_node(&tablet.root_node, &arg_value, tablets, use_math_tricks)
             }
         }
         TreeNode::Op(op, left, right) => {
