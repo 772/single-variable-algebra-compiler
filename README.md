@@ -1,4 +1,4 @@
-_"single-variable-algebra" is a minimalistic programming language._
+_A compiler for the minimalistic programming language single-variable-algebra._
 
 [![License: GPL3](https://img.shields.io/badge/License-GNU%20GPL-blue)](https://opensource.org/license/gpl-3-0)
 [![Crate](https://img.shields.io/crates/v/single-variable-algebra-compiler.svg)](https://crates.io/crates/single-variable-algebra-compiler)
