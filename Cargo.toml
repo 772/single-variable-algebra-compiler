@@ -1,6 +1,6 @@
 [package]
 name = "single-variable-algebra-compiler"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Armin Schäfer"]
 description = "A compiler for the minimalistic programming language single-variable-algebra."
 repository = "https://github.com/772/single-variable-algebra-compiler"
