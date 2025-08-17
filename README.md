@@ -15,7 +15,7 @@ This is a compiler that is only using a single variable, numbers, additions, sub
 
 Example input:
 
-```
+```bash
 cargo r -- "
 DECIMAL_PLACES(x)=27
 ABS(x)=(x^2)^(1/2)
