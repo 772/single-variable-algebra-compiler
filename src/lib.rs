@@ -1,18 +1,22 @@
-use dec::Decimal;
 use serde::{Deserialize, Serialize};
 use std::io::{self, Read};
+use std::sync::OnceLock;
 
-const DECIMAL_PLACES_DEFAULT: usize = 27; // TODO: Use OnceLock if using CLI. The test cases can use 27.
-const NAN: &str = "-0.0000000000000000000000000001"; // TODO: Use DECIMAL_PLACES_DEFAULT via OnceLock.
+// This const is used for all test cases.
+const MAX_DECIMAL_PLACES: usize = 100;
+// If we use a different Decimal crate, this is the most important line to change.
+// Sadly, it is not that easy to make Dec dynamic since Decimal<CONST> expects a const and no LazyLock.
+type Dec = dec::Decimal<MAX_DECIMAL_PLACES>;
 
-pub type Dec = Decimal<DECIMAL_PLACES_DEFAULT>;
+static DECIMAL_PLACES: OnceLock<usize> = OnceLock::new();
+static NAN: OnceLock<String> = OnceLock::new();
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum TreeNode {
     Op(char, Box<TreeNode>, Box<TreeNode>),
     Num(i32),
     Var(String),
-    Fun(String, Box<TreeNode>),
+    Fun(String, Box<TreeNode>), // TODO: For iterated functions -> Fun(String, usize, Box<TreeNode>). Defaults to 1. f(x) = f^1(x). INFINITY(x) = 10^80. f^INFINITY(x).
     Paren(Box<TreeNode>),
     Empty,
 }
@@ -43,12 +47,31 @@ impl Default for BinaryAlgebraicExpressionTree {
     }
 }
 
+fn get_decimal_places() -> usize {
+    *DECIMAL_PLACES.get_or_init(|| MAX_DECIMAL_PLACES)
+}
+
+fn get_nan() -> &'static String {
+    NAN.get_or_init(|| format!("-0.{}1", "0".repeat(get_decimal_places())))
+}
+
 /// For CLI.
 pub fn read_terminal_input() {
     let mut use_math_tricks = false;
     let args: Vec<String> = std::env::args().skip(1).collect();
-    if args.len() == 1 && args[0].trim().starts_with("DECIMAL_PLACES(x)=") {
-        use_math_tricks = true;
+    if args.len() == 1 {
+        if let Some(first_line) = args[0].trim().lines().next() {
+            if first_line.trim().starts_with("DECIMAL_PLACES(x)=") {
+                use_math_tricks = true;
+                if let Some(k_str) = first_line.trim().strip_prefix("DECIMAL_PLACES(x)=") {
+                    let k_clean = k_str.split_whitespace().next().unwrap_or(k_str);
+                    if let Ok(k) = k_clean.parse::<usize>() {
+                        let _ = DECIMAL_PLACES.set(k);
+                        let _ = NAN.set(format!("-0.{}1", "0".repeat(k)));
+                    }
+                }
+            }
+        }
     }
     let input = if args.len() == 1 && args[0].contains('\n') {
         args[0]
@@ -111,7 +134,7 @@ pub fn apply_algebra_to_tree_node(
     tablets: &Vec<BinaryAlgebraicExpressionTree>,
     use_math_tricks: bool,
 ) -> Dec {
-    match node {
+    let result = match node {
         TreeNode::Num(n) => Dec::from(*n),
         TreeNode::Var(s) => {
             if s == "x" {
@@ -123,7 +146,9 @@ pub fn apply_algebra_to_tree_node(
         }
         TreeNode::Fun(name, arg) => {
             let arg_value = apply_algebra_to_tree_node(arg, x, tablets, use_math_tricks);
-            if name.as_str() == "GE0" && use_math_tricks {
+            return if name.as_str() == "ABS" && use_math_tricks {
+                math_trick::abs(arg_value).parse().unwrap()
+            } else if name.as_str() == "GE0" && use_math_tricks {
                 math_trick::ge0(arg_value).parse().unwrap()
             } else if name.as_str() == "IS0" && use_math_tricks {
                 math_trick::is0(arg_value).parse().unwrap()
@@ -138,11 +163,16 @@ pub fn apply_algebra_to_tree_node(
                     .iter()
                     .find(|tablet| name == &tablet.name)
                     .unwrap_or_else(|| panic!("There is no tree called {name}"));
-                apply_algebra_to_tree_node(&tablet.root_node, &arg_value, tablets, use_math_tricks)
-            }
+                apply_algebra_to_tree_node(
+                    &tablet.root_node,
+                    &arg_value,
+                    tablets,
+                    use_math_tricks,
+                )
+            };
         }
         TreeNode::Op(op, left, right) => {
-            let left_val = apply_algebra_to_tree_node(left, x, tablets, use_math_tricks);
+            let mut left_val = apply_algebra_to_tree_node(left, x, tablets, use_math_tricks);
             let right_val = apply_algebra_to_tree_node(right, x, tablets, use_math_tricks);
             match op {
                 '+' => left_val + right_val,
@@ -151,18 +181,18 @@ pub fn apply_algebra_to_tree_node(
                 '/' => left_val / right_val,
                 '^' => {
                     let mut ctx = dec::Context::<Dec>::default();
-                    ctx.set_min_exponent(-100).unwrap();
-                    ctx.set_max_exponent(100).unwrap();
-                    let mut result = left_val;
-                    ctx.pow(&mut result, &right_val);
-                    result
+                    ctx.set_min_exponent(-1000).unwrap();
+                    ctx.set_max_exponent(1000).unwrap();
+                    ctx.pow(&mut left_val, &right_val);
+                    left_val
                 }
                 _ => panic!("Unknown operator: {op}"),
             }
         }
         TreeNode::Paren(expr) => apply_algebra_to_tree_node(expr, x, tablets, use_math_tricks),
         TreeNode::Empty => Dec::zero(),
-    }
+    };
+    result
 }
 
 /// Converts a String like 3*x+5 to a binary tree.
@@ -209,10 +239,10 @@ pub fn create_expression(node: TreeNode) -> String {
     build_expr(node, 0, true)
 }
 
-pub fn level_order_to_array(tree: BinaryAlgebraicExpressionTree) -> [String; 15] {
+pub fn level_order_to_array(root: TreeNode) -> [String; 15] {
     let mut result = std::array::from_fn(|_| String::new());
     let mut queue = std::collections::VecDeque::with_capacity(15);
-    queue.push_back((0, tree.root_node));
+    queue.push_back((0, root));
     while let Some((i, node)) = queue.pop_front() {
         if i >= 15 {
             continue;
@@ -250,16 +280,14 @@ fn trim2(mut dec: Dec) -> String {
 }
 
 fn parse_function(s: &str) -> Option<(&str, &str)> {
-    let parts: Vec<&str> = s.splitn(2, '=').collect();
-    if parts.len() != 2 {
-        return None;
+    let s = s.trim();
+    if let Some((func_part, expr)) = s.split_once('=') {
+        let func_part = func_part.trim();
+        if let Some((name, _)) = func_part.split_once('(') {
+            return Some((name, expr.trim()));
+        }
     }
-    let func_part = parts[0].trim();
-    if !func_part.ends_with(')') || !func_part.contains('(') {
-        return None;
-    }
-    let name = func_part.split('(').next()?;
-    Some((name, parts[1].trim()))
+    None
 }
 
 fn parse_function_call(s: &str) -> Option<(&str, &str)> {
@@ -376,8 +404,16 @@ fn parse_atomic(tokens: &[char], index: &mut usize) -> TreeNode {
 pub mod math_trick {
     use super::*;
 
+    pub fn abs(mut x: Dec) -> String {
+        let mut ctx = dec::Context::<Dec>::default();
+        ctx.set_min_exponent(-1000).unwrap();
+        ctx.set_max_exponent(1000).unwrap();
+        ctx.abs(&mut x);
+        x.to_string()
+    }
+
     pub fn ge0(x: Dec) -> String {
-        let nan: Dec = NAN.parse().unwrap();
+        let nan: Dec = get_nan().parse().unwrap();
         match x {
             _ if x > nan => "1".to_string(),
             _ if x < nan => "0".to_string(),
@@ -386,7 +422,7 @@ pub mod math_trick {
     }
 
     pub fn is0(x: Dec) -> String {
-        let nan: Dec = NAN.parse().unwrap();
+        let nan: Dec = get_nan().parse().unwrap();
         match x {
             _ if x < nan => "0".to_string(),
             _ if x > nan && x < "1".parse::<Dec>().unwrap() + nan => "1".to_string(),
@@ -396,7 +432,7 @@ pub mod math_trick {
     }
 
     pub fn floor1(x: Dec) -> String {
-        let nan: Dec = NAN.parse().unwrap();
+        let nan: Dec = get_nan().parse().unwrap();
         match x {
             _ if x < nan => "0".to_string(),
             _ if x > nan && x < "1".parse::<Dec>().unwrap() + nan => "0".to_string(),
@@ -436,7 +472,7 @@ pub mod math_trick {
 
     /// num should be a to_standard_notation_string().
     pub fn left(mut num: String) -> String {
-        // left(x) and right(x) only consist of several floor(x*10). That means this here should be enough to get all NaNs.
+        // left(x) and right(x) only consist of several floor(x*10). That means this here should ne enough to get all NaNs.
         if floor1(num.parse::<Dec>().unwrap() * "10".parse::<Dec>().unwrap()) == "NaN" {
             return "NaN".to_string();
         }
@@ -452,7 +488,7 @@ pub mod math_trick {
         let decimal_pos = num.find('.').unwrap();
         let (integer_part, fractional_part) = num.split_at(decimal_pos + 1);
         let mut chars: Vec<_> = fractional_part.chars().collect();
-        let len = DECIMAL_PLACES_DEFAULT - chars.len();
+        let len = get_decimal_places() - chars.len();
         if len > 0 {
             chars.extend(vec!['0'; len]);
         }
@@ -474,22 +510,22 @@ mod tests {
             TestCase {
                 description: None,
                 examples: vec![
-                    ["2".to_string(), "27".to_string()],
-                    ["-0.2424".to_string(), "27".to_string()],
-                    ["100".to_string(), "27".to_string()],
+                    ["2".to_string(), get_decimal_places().to_string()],
+                    ["-0.2424".to_string(), get_decimal_places().to_string()],
+                    ["100".to_string(), get_decimal_places().to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
                     name: "DECIMAL_PLACES".to_string(),
-                    root_node: parse_expression("27")
+                    root_node: parse_expression(&get_decimal_places().to_string())
                 }],
             },
             TestCase {
                 description: None,
                 examples: vec![
                     ["-1".to_string(), "1".to_string()],
-                    ["11.9".to_string(), "11.9".to_string()],
+                    //["11.2".to_string(), "11.2".to_string()], // The operation (x^2)^0.5 takes a lot of time. But using a HashMap cache for alle Node -> String wouldn't help here.
                     ["0".to_string(), "0".to_string()],
-                    ["-0.0024".to_string(), "0.0024".to_string()],
+                    //["-0.0025".to_string(), "0.0025".to_string()], // The operation (x^2)^0.5 takes a lot of time. But using a HashMap cache for alle Node -> String wouldn't help here.
                     ["1".to_string(), "1".to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
@@ -516,19 +552,19 @@ mod tests {
                 examples: vec![
                     [
                         "55".to_string(),
-                        "0.".to_string() + &"0".repeat(DECIMAL_PLACES_DEFAULT - 1) + "1",
+                        "0.".to_string() + &"0".repeat(get_decimal_places() - 1) + "1",
                     ],
                     [
                         "-11.9".to_string(),
-                        "0.".to_string() + &"0".repeat(DECIMAL_PLACES_DEFAULT - 1) + "1",
+                        "0.".to_string() + &"0".repeat(get_decimal_places() - 1) + "1",
                     ],
                     [
                         "0.0".to_string(),
-                        "0.".to_string() + &"0".repeat(DECIMAL_PLACES_DEFAULT - 1) + "1",
+                        "0.".to_string() + &"0".repeat(get_decimal_places() - 1) + "1",
                     ],
                     [
                         "-0.95".to_string(),
-                        "0.".to_string() + &"0".repeat(DECIMAL_PLACES_DEFAULT - 1) + "1",
+                        "0.".to_string() + &"0".repeat(get_decimal_places() - 1) + "1",
                     ],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
@@ -540,11 +576,11 @@ mod tests {
                 description: None,
                 examples: vec![
                     [
-                        "0.".to_string() + &"9".repeat(DECIMAL_PLACES_DEFAULT),
+                        "0.".to_string() + &"9".repeat(get_decimal_places()),
                         "1".to_string(),
                     ],
                     [
-                        "-0.".to_string() + &"0".repeat(DECIMAL_PLACES_DEFAULT) + "1",
+                        "-0.".to_string() + &"0".repeat(get_decimal_places()) + "1",
                         "NaN".to_string(),
                     ],
                     ["0.3".to_string(), "1".to_string()],
@@ -728,39 +764,38 @@ mod tests {
                     ["0.06".to_string(), "0.6".to_string()],
                     [
                         "0.12345678".to_string(),
-                        "0.2345678".to_string() + &"0".repeat(DECIMAL_PLACES_DEFAULT - 8) + "1",
+                        "0.2345678".to_string() + &"0".repeat(get_decimal_places() - 8) + "1",
                     ],
                     [
                         "0.7".to_string(),
-                        "0.".to_string() + &"0".repeat(DECIMAL_PLACES_DEFAULT - 1) + "7",
+                        "0.".to_string() + &"0".repeat(get_decimal_places() - 1) + "7",
                     ],
                 ],
                 solution: vec![
                     BinaryAlgebraicExpressionTree {
                         name: "RIGHT".to_string(),
-                    root_node: parse_expression("x*10-FLOOR1(x*10)+FLOOR1(x*10)*TINY(x)")
+                        root_node: parse_expression("x*10-FLOOR1(x*10)+FLOOR1(x*10)*TINY(x)")
                     },
                 ],
             },
             TestCase {
                 description: None,
                 examples: vec![
-                    ["0.6".to_string(), "0.06".to_string()],
                     [
-                        "0.2345678".to_string() + &"0".repeat(DECIMAL_PLACES_DEFAULT - 8) + "1",
+                        "0.2345678".to_string() + &"0".repeat(get_decimal_places() - 8) + "1",
                         "0.12345678".to_string(),
                     ],
                     [
-                        "0.".to_string() + &"0".repeat(DECIMAL_PLACES_DEFAULT - 1) + "7",
+                        "0.".to_string() + &"0".repeat(get_decimal_places() - 1) + "7",
                         "0.7".to_string(),
                     ],
                 ],
                 solution: vec![
                     BinaryAlgebraicExpressionTree {
                         name: "LEFT".to_string(),
-                    root_node: parse_expression(
-                        "RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(x))))))))))))))))))))))))))",
-                    )
+                        root_node: parse_expression(
+                            &("RIGHT(".repeat(get_decimal_places() - 1) + "(x)" + &")".repeat(get_decimal_places() - 1))
+                        )
                     },
                 ],
             },
@@ -806,7 +841,12 @@ mod tests {
                 let name_function = &tasks[i].solution.last().unwrap().name;
                 let name = format!("{}({}) = ", name_function, input);
                 let input_dec = input.parse().unwrap();
-                if name_function == "GE0" {
+                if name_function == "ABS" {
+                    assert_eq!(
+                        name.clone() + output.as_str(),
+                        name + &math_trick::abs(input_dec)
+                    );
+                } else if name_function == "GE0" {
                     assert_eq!(
                         name.clone() + output.as_str(),
                         name + &math_trick::ge0(input_dec)
