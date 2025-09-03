@@ -61,16 +61,17 @@ pub fn read_terminal_input() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     if args.len() == 1
         && let Some(first_line) = args[0].trim().lines().next()
-            && first_line.trim().starts_with("DECIMAL_PLACES(x)=") {
-                use_math_tricks = true;
-                if let Some(k_str) = first_line.trim().strip_prefix("DECIMAL_PLACES(x)=") {
-                    let k_clean = k_str.split_whitespace().next().unwrap_or(k_str);
-                    if let Ok(k) = k_clean.parse::<usize>() {
-                        let _ = DECIMAL_PLACES.set(k);
-                        let _ = NAN.set(format!("-0.{}1", "0".repeat(k)));
-                    }
-                }
+        && first_line.trim().starts_with("DECIMAL_PLACES(x)=")
+    {
+        use_math_tricks = true;
+        if let Some(k_str) = first_line.trim().strip_prefix("DECIMAL_PLACES(x)=") {
+            let k_clean = k_str.split_whitespace().next().unwrap_or(k_str);
+            if let Ok(k) = k_clean.parse::<usize>() {
+                let _ = DECIMAL_PLACES.set(k);
+                let _ = NAN.set(format!("-0.{}1", "0".repeat(k)));
             }
+        }
+    }
     let input = if args.len() == 1 && args[0].contains('\n') {
         args[0]
             .split('\n')
