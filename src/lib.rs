@@ -59,9 +59,9 @@ fn get_nan() -> &'static String {
 pub fn read_terminal_input() {
     let mut use_math_tricks = false;
     let args: Vec<String> = std::env::args().skip(1).collect();
-    if args.len() == 1 {
-        if let Some(first_line) = args[0].trim().lines().next() {
-            if first_line.trim().starts_with("DECIMAL_PLACES(x)=") {
+    if args.len() == 1
+        && let Some(first_line) = args[0].trim().lines().next()
+            && first_line.trim().starts_with("DECIMAL_PLACES(x)=") {
                 use_math_tricks = true;
                 if let Some(k_str) = first_line.trim().strip_prefix("DECIMAL_PLACES(x)=") {
                     let k_clean = k_str.split_whitespace().next().unwrap_or(k_str);
@@ -71,8 +71,6 @@ pub fn read_terminal_input() {
                     }
                 }
             }
-        }
-    }
     let input = if args.len() == 1 && args[0].contains('\n') {
         args[0]
             .split('\n')
@@ -134,7 +132,7 @@ pub fn apply_algebra_to_tree_node(
     tablets: &Vec<BinaryAlgebraicExpressionTree>,
     use_math_tricks: bool,
 ) -> Dec {
-    let result = match node {
+    match node {
         TreeNode::Num(n) => Dec::from(*n),
         TreeNode::Var(s) => {
             if s == "x" {
@@ -146,7 +144,7 @@ pub fn apply_algebra_to_tree_node(
         }
         TreeNode::Fun(name, arg) => {
             let arg_value = apply_algebra_to_tree_node(arg, x, tablets, use_math_tricks);
-            return if name.as_str() == "ABS" && use_math_tricks {
+            if name.as_str() == "ABS" && use_math_tricks {
                 math_trick::abs(arg_value).parse().unwrap()
             } else if name.as_str() == "GE0" && use_math_tricks {
                 math_trick::ge0(arg_value).parse().unwrap()
@@ -163,13 +161,8 @@ pub fn apply_algebra_to_tree_node(
                     .iter()
                     .find(|tablet| name == &tablet.name)
                     .unwrap_or_else(|| panic!("There is no tree called {name}"));
-                apply_algebra_to_tree_node(
-                    &tablet.root_node,
-                    &arg_value,
-                    tablets,
-                    use_math_tricks,
-                )
-            };
+                apply_algebra_to_tree_node(&tablet.root_node, &arg_value, tablets, use_math_tricks)
+            }
         }
         TreeNode::Op(op, left, right) => {
             let mut left_val = apply_algebra_to_tree_node(left, x, tablets, use_math_tricks);
@@ -191,8 +184,7 @@ pub fn apply_algebra_to_tree_node(
         }
         TreeNode::Paren(expr) => apply_algebra_to_tree_node(expr, x, tablets, use_math_tricks),
         TreeNode::Empty => Dec::zero(),
-    };
-    result
+    }
 }
 
 /// Converts a String like 3*x+5 to a binary tree.
