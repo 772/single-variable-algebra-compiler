@@ -42,11 +42,7 @@ LEFT(0.300000000000000000000000012)
 
 Output: `0.230000000000000000000000001`
 
-> [!NOTE]
-> Some of the functions above contain performance optimizations. So using them is recommended.
-
-> [!WARNING]
-> Currently, it is not possible to overwrite `ALLOWED_DECIMAL_PLACES(x)=27`. In the next update, this will be possible.
+Note that some of the functions above contain performance optimizations. So using them is recommended.
 
 ## Prooving Turing completeness
 
@@ -319,28 +315,3 @@ true_floor^[340282366920938463463374607431768211455](772.553) = 772
 ## Trivia
 
 This programming language was designed in years of 2019, 2020 and 2024 by the author of this compiler. He wrote his Master Thesis about this.
-
-## How to update the wasm branch in this repository
-
-Note that after the WebAssembly branch was initially created, I deleted all files in it.
-
-```
-cargo b
-rustup target add wasm32-unknown-unknown
-cargo install wasm-bindgen-cli
-git add -A && git commit -m "Update."
-git push
-cargo build --target wasm32-unknown-unknown --release
-wasm-bindgen --no-typescript --target web --out-dir ./../ --out-name "wasm" ./target/wasm32-unknown-unknown/release/*.wasm
-cp index.html ..
-cp example.md ..
-git checkout wasm
-rm assets -R
-mv ../index.html .
-mv ../wasm.js .
-mv ../wasm_bg.wasm .
-git add wasm.js wasm_bg.wasm example.md
-git commit -m "Update wasm files."
-git push -f
-git checkout main
-```
