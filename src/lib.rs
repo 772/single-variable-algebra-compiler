@@ -11,7 +11,7 @@ type Dec = dec::Decimal<MAX_DECIMAL_PLACES>;
 static DECIMAL_PLACES: OnceLock<usize> = OnceLock::new();
 static NAN: OnceLock<String> = OnceLock::new();
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
 pub enum TreeNode {
     Op(char, Box<TreeNode>, Box<TreeNode>),
     Num(i32),
@@ -22,7 +22,7 @@ pub enum TreeNode {
 }
 
 /// The main struct of this crate. A binary algebraic expression tree is a TreeNode.
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
 pub struct BinaryAlgebraicExpressionTree {
     pub name: String,
     pub root_node: TreeNode,
