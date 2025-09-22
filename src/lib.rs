@@ -4,8 +4,13 @@ use std::sync::OnceLock;
 
 // This const is used for all test cases.
 const MAX_DECIMAL_PLACES: usize = 100;
-// If we use a different Decimal crate, this is the most important line to change.
 // Sadly, it is not that easy to make Dec dynamic since Decimal<CONST> expects a const and no LazyLock.
+// TODO: Find a better crate. If we use a different Decimal crate, this is the most important line to change.
+// E.g.:
+// ```dec::Decimal<MAX_DECIMAL_PLACES>``` is incompatible to wasm. See https://github.com/MaterializeInc/rust-dec/issues/88 and https://github.com/wasm-bindgen/wasm-bindgen/pull/2209.
+// ```fastnum::decimal::Decimal<MAX_DECIMAL_PLACES>``` has eternal compile times with MAX_DECIMAL_PLACES = 1000 and #![allow(long_running_const_eval)].
+// ```bigdecimal::BigDecimal``` is not able to use powf. See https://github.com/akubera/bigdecimal-rs/issues/74.
+// All other crates lack precision.
 type Dec = dec::Decimal<MAX_DECIMAL_PLACES>;
 
 static DECIMAL_PLACES: OnceLock<usize> = OnceLock::new();
