@@ -54,7 +54,7 @@ fn get_nan() -> &'static String {
 
 #[cfg(not(target_arch = "wasm32"))]
 fn output(s: String) {
-	println!("{s}");
+    println!("{s}");
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -80,12 +80,14 @@ fn read_args() -> Vec<String> {
     use web_sys::wasm_bindgen::JsCast;
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
-    vec![document
-        .get_element_by_id("input")
-        .unwrap()
-        .dyn_into::<web_sys::HtmlTextAreaElement>()
-        .unwrap()
-        .value()]
+    vec![
+        document
+            .get_element_by_id("input")
+            .unwrap()
+            .dyn_into::<web_sys::HtmlTextAreaElement>()
+            .unwrap()
+            .value(),
+    ]
 }
 
 /// For CLI.
@@ -139,26 +141,24 @@ pub fn read_input() {
             };
             trees.push(tree);
         } else {
-			output(format!("Invalid function definition: {arg}"));
+            output(format!("Invalid function definition: {arg}"));
             return;
         }
     }
     if let Some((func_name, input_val)) = parse_function_call(input.last().unwrap()) {
         if let Some(tree) = trees.iter().find(|t| t.name == func_name) {
             let x: Dec = input_val.parse().unwrap_or_else(|_| {
-				output(format!("Invalid input value: {input_val}"));
+                output(format!("Invalid input value: {input_val}"));
                 std::process::exit(1);
             });
             let result = apply_algebra_to_tree_node(&tree.root_node, &x, &trees, use_math_tricks);
-            println!("{}", trim2(result));
+            output(format!("{}", trim2(result)));
         } else {
-			output(format!("Function {func_name} not defined"));
-            println!("Function {func_name} not defined");
+            output(format!("Function {func_name} not defined"));
         }
     } else {
-		output(format!("Invalid function call: {}", input.last().unwrap()));
+        output(format!("Invalid function call: {}", input.last().unwrap()));
     }
-    
 }
 
 /// Calculate the result of a binary tree.
