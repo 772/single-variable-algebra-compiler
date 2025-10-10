@@ -1,23 +1,31 @@
-_A compiler for the minimalistic programming language single-variable-algebra._
-
 [![License: GPL3](https://img.shields.io/badge/License-GNU%20GPL-blue)](https://opensource.org/license/gpl-3-0)
 [![Doc](https://docs.rs/single-variable-algebra-compiler/badge.svg)](https://docs.rs/single-variable-algebra-compiler)
 [![Crate](https://img.shields.io/crates/v/single-variable-algebra-compiler.svg)](https://crates.io/crates/single-variable-algebra-compiler)
 
 ## What is single-variable-algebra-compiler?
 
-This is a compiler that is only using a single variable, numbers, additions, subtractions, multiplications, divisions, exponentiations and functions that are using the named things.
+A compiler for Single Variable Algebra (SVA) - a minimalist programming language that uses only:
+- A single variable (x)
+- Numbers
+- Basic arithmetic (+, -, *, /, ^)
+- Functions built from these elements
+
+__Yet another programming language?__ No. While not every math expression qualifies as SVA, every valid SVA program is syntactically correct middle school mathematics. This is making it perfect for learning both programming and math concepts.
 
 ## Usage
 
-- **Installed**: `single-variable-algebra-compiler <input>` (install via `cargo install single-variable-algebra-compiler`).
-- **From source**: `cargo r -- <input>` (after cloning this repository).
+Use https://772.github.io/single-variable-algebra-compiler/ to test this!
+
+> [!WARNING]
+> Known limitations: The WebAssembly version is limited to 25 decimal places due to the lack of a pure Rust (WASM-compatible) crate that supports arbitrary-precision arithmetic with a `powf` function.
+
+Run locally via `cargo r -- <input>` after cloning this repository or run `single-variable-algebra-compiler <input>` after installing it via `cargo install single-variable-algebra-compiler`).
 
 Example input:
 
 ```bash
 cargo r -- "
-DECIMAL_PLACES(x)=27
+DECIMAL_PLACES(x)=25
 ABS(x)=(x^2)^(1/2)
 H(x)=(x+ABS(x))/(2*x)
 TINY(x)=10^(-DECIMAL_PLACES(x))
@@ -35,7 +43,7 @@ IS8(x)=IS0(x-8)
 IS9(x)=IS0(x-9)
 FLOOR1(x)=IS1(x)+2*IS2(x)+3*IS3(x)+4*IS4(x)+5*IS5(x)+6*IS6(x)+7*IS7(x)+8*IS8(x)+9*IS9(x)
 RIGHT(x)=x*10-FLOOR1(x*10)+FLOOR1(x*10)*TINY(x)
-LEFT(x)=RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(x))))))))))))))))))))))))))
+LEFT(x)=RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(x))))))))))))))))))))))))
 LEFT(0.300000000000000000000000012)
 "
 ```

@@ -2,16 +2,8 @@ use serde::{Deserialize, Serialize};
 use std::io::{self, Read};
 use std::sync::OnceLock;
 
-// This const is used for all test cases.
-const MAX_DECIMAL_PLACES: usize = 100;
-// Sadly, it is not that easy to make Dec dynamic since Decimal<CONST> expects a const and no LazyLock.
-// TODO: Find a better crate. If we use a different Decimal crate, this is the most important line to change.
-// E.g.:
-// ```dec::Decimal<MAX_DECIMAL_PLACES>``` is incompatible to wasm. See https://github.com/MaterializeInc/rust-dec/issues/88 and https://github.com/wasm-bindgen/wasm-bindgen/pull/2209.
-// ```fastnum::decimal::Decimal<MAX_DECIMAL_PLACES>``` has eternal compile times with MAX_DECIMAL_PLACES = 1000 and #![allow(long_running_const_eval)].
-// ```bigdecimal::BigDecimal``` is not able to use powf. See https://github.com/akubera/bigdecimal-rs/issues/74.
-// All other crates lack precision.
-type Dec = dec::Decimal<MAX_DECIMAL_PLACES>;
+mod decimal_crate;
+use decimal_crate::*;
 
 static DECIMAL_PLACES: OnceLock<usize> = OnceLock::new();
 static NAN: OnceLock<String> = OnceLock::new();
@@ -60,10 +52,46 @@ fn get_nan() -> &'static String {
     NAN.get_or_init(|| format!("-0.{}1", "0".repeat(get_decimal_places())))
 }
 
+#[cfg(not(target_arch = "wasm32"))]
+fn output(s: String) {
+	println!("{s}");
+}
+
+#[cfg(target_arch = "wasm32")]
+fn output(s: String) {
+    use web_sys::wasm_bindgen::JsCast;
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    let textarea = document
+        .get_element_by_id("input")
+        .unwrap()
+        .dyn_into::<web_sys::HtmlTextAreaElement>()
+        .unwrap();
+    textarea.set_value(&s);
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn read_args() -> Vec<String> {
+    std::env::args().skip(1).collect()
+}
+
+#[cfg(target_arch = "wasm32")]
+fn read_args() -> Vec<String> {
+    use web_sys::wasm_bindgen::JsCast;
+    let window = web_sys::window().unwrap();
+    let document = window.document().unwrap();
+    vec![document
+        .get_element_by_id("input")
+        .unwrap()
+        .dyn_into::<web_sys::HtmlTextAreaElement>()
+        .unwrap()
+        .value()]
+}
+
 /// For CLI.
-pub fn read_terminal_input() {
+pub fn read_input() {
     let mut use_math_tricks = false;
-    let args: Vec<String> = std::env::args().skip(1).collect();
+    let args: Vec<String> = read_args();
     if args.len() == 1
         && let Some(first_line) = args[0].trim().lines().next()
         && first_line.trim().starts_with("DECIMAL_PLACES(x)=")
@@ -111,24 +139,26 @@ pub fn read_terminal_input() {
             };
             trees.push(tree);
         } else {
-            println!("Invalid function definition: {arg}");
+			output(format!("Invalid function definition: {arg}"));
             return;
         }
     }
     if let Some((func_name, input_val)) = parse_function_call(input.last().unwrap()) {
         if let Some(tree) = trees.iter().find(|t| t.name == func_name) {
             let x: Dec = input_val.parse().unwrap_or_else(|_| {
-                println!("Invalid input value: {input_val}");
+				output(format!("Invalid input value: {input_val}"));
                 std::process::exit(1);
             });
             let result = apply_algebra_to_tree_node(&tree.root_node, &x, &trees, use_math_tricks);
             println!("{}", trim2(result));
         } else {
+			output(format!("Function {func_name} not defined"));
             println!("Function {func_name} not defined");
         }
     } else {
-        println!("Invalid function call: {}", input.last().unwrap());
+		output(format!("Invalid function call: {}", input.last().unwrap()));
     }
+    
 }
 
 /// Calculate the result of a binary tree.
@@ -159,7 +189,7 @@ pub fn apply_algebra_to_tree_node(
             } else if name.as_str() == "FLOOR1" && use_math_tricks {
                 math_trick::floor1(arg_value).parse().unwrap()
             } else if name.as_str() == "LEFT" && use_math_tricks {
-                math_trick::left(arg_value.to_standard_notation_string())
+                math_trick::left(arg_value.to_string()) // .to_standard_notation_string()
                     .parse()
                     .unwrap()
             } else {
@@ -171,25 +201,19 @@ pub fn apply_algebra_to_tree_node(
             }
         }
         TreeNode::Op(op, left, right) => {
-            let mut left_val = apply_algebra_to_tree_node(left, x, tablets, use_math_tricks);
+            let left_val = apply_algebra_to_tree_node(left, x, tablets, use_math_tricks);
             let right_val = apply_algebra_to_tree_node(right, x, tablets, use_math_tricks);
             match op {
                 '+' => left_val + right_val,
                 '-' => left_val - right_val,
                 '*' => left_val * right_val,
                 '/' => left_val / right_val,
-                '^' => {
-                    let mut ctx = dec::Context::<Dec>::default();
-                    ctx.set_min_exponent(-1000).unwrap();
-                    ctx.set_max_exponent(1000).unwrap();
-                    ctx.pow(&mut left_val, &right_val);
-                    left_val
-                }
+                '^' => pow(left_val, right_val),
                 _ => panic!("Unknown operator: {op}"),
             }
         }
         TreeNode::Paren(expr) => apply_algebra_to_tree_node(expr, x, tablets, use_math_tricks),
-        TreeNode::Empty => Dec::zero(),
+        TreeNode::Empty => zero(),
     }
 }
 
@@ -267,14 +291,15 @@ pub fn level_order_to_array(root: TreeNode) -> [String; 15] {
     result
 }
 
-fn trim2(mut dec: Dec) -> String {
-    dec.trim();
-    let result = dec.to_standard_notation_string();
-    if result == "-0" {
-        "0".to_string()
-    } else {
-        result
+fn trim2(dec: Dec) -> String {
+    let mut x = normal_string(dec);
+    if x.contains('.') {
+        x = x.trim_end_matches('0').trim_end_matches('.').to_string();
     }
+    if x.starts_with("-0") {
+        x.remove(0);
+    }
+    x
 }
 
 fn parse_function(s: &str) -> Option<(&str, &str)> {
@@ -402,12 +427,12 @@ fn parse_atomic(tokens: &[char], index: &mut usize) -> TreeNode {
 pub mod math_trick {
     use super::*;
 
-    pub fn abs(mut x: Dec) -> String {
-        let mut ctx = dec::Context::<Dec>::default();
-        ctx.set_min_exponent(-1000).unwrap();
-        ctx.set_max_exponent(1000).unwrap();
-        ctx.abs(&mut x);
-        x.to_string()
+    pub fn abs(x: Dec) -> String {
+        let mut res = x.to_string();
+        if res.starts_with('-') {
+            res.remove(0);
+        }
+        res
     }
 
     pub fn ge0(x: Dec) -> String {
