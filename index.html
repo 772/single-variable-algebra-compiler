@@ -44,6 +44,9 @@
         resize: none;
         padding: 5px;
         font-style: Consolas;
+        overflow-wrap: normal;
+        overflow-x: scroll;
+        white-space: pre;
       }
       button {
         background-color: #04AA6D;
@@ -64,10 +67,31 @@
     </style>
   </head>
   <body>
-    <div style="width:100%;height:6vh;"><button style="float:left"><b>RUN &#9654;</b></button> <button onclick="document.location='https://github.com/772/single-variable-algebra-compiler'" style="float:right;background-color:black"><b>Git Repository</b></button></div>
+    <div style="width:100%;height:6vh;"><button style="float:left" onclick="window.location.reload()"><b>RUN &#9654;</b></button> <button onclick="document.location='https://github.com/772/single-variable-algebra-compiler'" style="float:right;background-color:black"><b>Git Repository</b></button></div>
     <div class="container">
-      <div class="box box-1"><textarea>FOO(x)=4</textarea></div>
-      <div class="box box-2"><textarea disabled></textarea></div>
+      <div class="box box-1" id="input"><textarea>
+decimals(x) = 25
+abs(x) = (x^2)^(1/2)
+h(x) = (x+abs(x))/(2*x)
+tiny(x) = 10^(-decimals(x))
+ge0(x) = H(x+tiny(x)/10)
+lt1(x) = 1-ge0(x-1)
+is0(x) = ge0(x)*lt1(x)
+is1(x) = is0(x-1)
+is2(x) = is0(x-2)
+is3(x) = is0(x-3)
+is4(x) = is0(x-4)
+is5(x) = is0(x-5)
+is6(x) = is0(x-6)
+is7(x) = is0(x-7)
+is8(x) = is0(x-8)
+is9(x) = is0(x-9)
+floor1(x) = is1(x)+2*is2(x)+3*is3(x)+4*is4(x)+5*is5(x)+6*is6(x)+7*is7(x)+8*is8(x)+9*is9(x)
+right(x) = x*10-floor1(x*10)+floor1(x*10)*tiny(x)
+left(x) = right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(x))))))))))))))))))))))))
+left(0.300000000000000000000000012)
+</textarea></div>
+      <div class="box box-2" id="output"><textarea disabled></textarea></div>
     </div>
   </body>
 </html>
