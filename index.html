@@ -93,5 +93,17 @@ left(0.300000000000000000000000012)
 </textarea></div>
       <div class="box box-2" id="output"><textarea disabled></textarea></div>
     </div>
+	<script type="module">
+		import init from "./wasm.js";
+		init().catch((error) => {
+			if (
+				!error.message.startsWith(
+					"Using exceptions for control flow, don't mind me. This isn't actually an error!",
+				)
+			) {
+				throw error;
+			}
+		});
+	</script>
   </body>
 </html>
