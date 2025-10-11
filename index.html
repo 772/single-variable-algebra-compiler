@@ -69,7 +69,7 @@
   <body>
     <div style="width:100%;height:6vh;"><button style="float:left" onclick="window.location.reload()"><b>RUN &#9654;</b></button> <button onclick="document.location='https://github.com/772/single-variable-algebra-compiler'" style="float:right;background-color:black"><b>Git Repository</b></button></div>
     <div class="container">
-      <div class="box box-1" id="input"><textarea>
+      <div class="box box-1"><textarea id="input">
 decimals(x) = 25
 abs(x) = (x^2)^(1/2)
 h(x) = (x+abs(x))/(2*x)
@@ -91,7 +91,7 @@ right(x) = x*10-floor1(x*10)+floor1(x*10)*tiny(x)
 left(x) = right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(x))))))))))))))))))))))))
 left(0.300000000000000000000000012)
 </textarea></div>
-      <div class="box box-2" id="output"><textarea disabled></textarea></div>
+      <div class="box box-2"><textarea id="output" disabled></textarea></div>
     </div>
 	<script type="module">
 		import init from "./wasm.js";
