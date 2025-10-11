@@ -63,7 +63,7 @@ fn output(s: String) {
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
     let textarea = document
-        .get_element_by_id("input")
+        .get_element_by_id("output")
         .unwrap()
         .dyn_into::<web_sys::HtmlTextAreaElement>()
         .unwrap();
