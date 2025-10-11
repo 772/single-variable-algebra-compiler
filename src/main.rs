@@ -1,3 +1,5 @@
+use web_sys::console;
+
 fn main() {
     output("TEST".to_string());
 }
@@ -9,7 +11,11 @@ fn output(s: String) {
 
 #[cfg(target_arch = "wasm32")]
 fn output(s: String) {
-    use web_sys::wasm_bindgen::JsCast;
+	
+console::log_1(&"Hello, world!".into());
+	
+	
+/*    use web_sys::wasm_bindgen::JsCast;
     let window = web_sys::window().unwrap();
     let document = window.document().unwrap();
     let textarea = document
@@ -18,4 +24,4 @@ fn output(s: String) {
         .dyn_into::<web_sys::HtmlTextAreaElement>()
         .unwrap();
     textarea.set_value(&s);
-}
+*/}
