@@ -30,7 +30,7 @@ pub fn pow(mut x: Dec, exp: Dec) -> Dec {
 }
 #[cfg(target_arch = "wasm32")]
 pub fn pow(x: Dec, exp: Dec) -> Dec {
-    x.powf(exp)
+    x.pow(exp)
 }
 
 #[cfg(not(target_arch = "wasm32"))]
