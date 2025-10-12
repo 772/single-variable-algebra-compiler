@@ -401,7 +401,7 @@ fn parse_atomic(tokens: &[char], index: &mut usize) -> TreeNode {
             *index += 1;
             TreeNode::Var("x".to_string())
         }
-        'A'..='Z' => {
+        'A'..='Z' | 'a'..='w' | 'y'..='z' => {
             let mut name = String::new();
             while *index < tokens.len()
                 && (tokens[*index].is_alphanumeric() || tokens[*index] == '_')
