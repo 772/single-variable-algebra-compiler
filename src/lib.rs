@@ -96,10 +96,10 @@ pub fn read_input() {
     let args: Vec<String> = read_args();
     if args.len() == 1
         && let Some(first_line) = args[0].trim().lines().next()
-        && first_line.trim().starts_with("DECIMAL_PLACES(x)=")
+        && first_line.trim().starts_with("decimals(x) =")
     {
         use_math_tricks = true;
-        if let Some(k_str) = first_line.trim().strip_prefix("DECIMAL_PLACES(x)=") {
+        if let Some(k_str) = first_line.trim().strip_prefix("decimals(x) =") {
             let k_clean = k_str.split_whitespace().next().unwrap_or(k_str);
             if let Ok(k) = k_clean.parse::<usize>() {
                 let _ = DECIMAL_PLACES.set(k);
@@ -180,15 +180,15 @@ pub fn apply_algebra_to_tree_node(
         }
         TreeNode::Fun(name, arg) => {
             let arg_value = apply_algebra_to_tree_node(arg, x, tablets, use_math_tricks);
-            if name.as_str() == "ABS" && use_math_tricks {
+            if name.as_str() == "abs" && use_math_tricks {
                 math_trick::abs(arg_value).parse().unwrap()
-            } else if name.as_str() == "GE0" && use_math_tricks {
+            } else if name.as_str() == "ge0" && use_math_tricks {
                 math_trick::ge0(arg_value).parse().unwrap()
-            } else if name.as_str() == "IS0" && use_math_tricks {
+            } else if name.as_str() == "is0" && use_math_tricks {
                 math_trick::is0(arg_value).parse().unwrap()
-            } else if name.as_str() == "FLOOR1" && use_math_tricks {
+            } else if name.as_str() == "floor1" && use_math_tricks {
                 math_trick::floor1(arg_value).parse().unwrap()
-            } else if name.as_str() == "LEFT" && use_math_tricks {
+            } else if name.as_str() == "left" && use_math_tricks {
                 math_trick::left(arg_value.to_string()) // .to_standard_notation_string()
                     .parse()
                     .unwrap()
@@ -864,27 +864,27 @@ mod tests {
                 let name_function = &tasks[i].solution.last().unwrap().name;
                 let name = format!("{}({}) = ", name_function, input);
                 let input_dec = input.parse().unwrap();
-                if name_function == "ABS" {
+                if name_function == "abs" {
                     assert_eq!(
                         name.clone() + output.as_str(),
                         name + &math_trick::abs(input_dec)
                     );
-                } else if name_function == "GE0" {
+                } else if name_function == "ge0" {
                     assert_eq!(
                         name.clone() + output.as_str(),
                         name + &math_trick::ge0(input_dec)
                     );
-                } else if name_function == "IS0" {
+                } else if name_function == "is0" {
                     assert_eq!(
                         name.clone() + output.as_str(),
                         name + &math_trick::is0(input_dec)
                     );
-                } else if name_function == "FLOOR1" {
+                } else if name_function == "floor1" {
                     assert_eq!(
                         name.clone() + output.as_str(),
                         name + &math_trick::floor1(input_dec)
                     );
-                } else if name_function == "LEFT" {
+                } else if name_function == "left" {
                     assert_eq!(
                         name.clone() + output.as_str(),
                         name + &math_trick::left(input_dec.to_standard_notation_string())
