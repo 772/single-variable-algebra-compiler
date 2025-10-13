@@ -25,30 +25,30 @@ Example input:
 
 ```bash
 cargo r -- "
-DECIMAL_PLACES(x)=25
-ABS(x)=(x^2)^(1/2)
-H(x)=(x+ABS(x))/(2*x)
-TINY(x)=10^(-DECIMAL_PLACES(x))
-GE0(x)=H(x+TINY(x)/10)
-LT1(x)=1-GE0(x-1)
-IS0(x)=GE0(x)*LT1(x)
-IS1(x)=IS0(x-1)
-IS2(x)=IS0(x-2)
-IS3(x)=IS0(x-3)
-IS4(x)=IS0(x-4)
-IS5(x)=IS0(x-5)
-IS6(x)=IS0(x-6)
-IS7(x)=IS0(x-7)
-IS8(x)=IS0(x-8)
-IS9(x)=IS0(x-9)
-FLOOR1(x)=IS1(x)+2*IS2(x)+3*IS3(x)+4*IS4(x)+5*IS5(x)+6*IS6(x)+7*IS7(x)+8*IS8(x)+9*IS9(x)
-RIGHT(x)=x*10-FLOOR1(x*10)+FLOOR1(x*10)*TINY(x)
-LEFT(x)=RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(RIGHT(x))))))))))))))))))))))))
-LEFT(0.300000000000000000000000012)
+decimals(x) = 25
+abs(x) = (x^2)^(1/2)
+H(x) = (x+abs(x))/(2*x)
+tiny(x) = 10^(-decimals(x))
+ge0(x) = H(x+tiny(x)/10)
+lt1(x) = 1-ge0(x-1)
+is0(x) = ge0(x)*lt1(x)
+is1(x) = is0(x-1)
+is2(x) = is0(x-2)
+is3(x) = is0(x-3)
+is4(x) = is0(x-4)
+is5(x) = is0(x-5)
+is6(x) = is0(x-6)
+is7(x) = is0(x-7)
+is8(x) = is0(x-8)
+is9(x) = is0(x-9)
+floor1(x) = is1(x)+2*is2(x)+3*is3(x)+4*is4(x)+5*is5(x)+6*is6(x)+7*is7(x)+8*is8(x)+9*is9(x)
+right(x) = x*10-floor1(x*10)+floor1(x*10)*tiny(x)
+left(x) = right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(x))))))))))))))))))))))))
+left(0.3000000000000000000000012)
 "
 ```
 
-Output: `0.230000000000000000000000001`
+Output: `0.2300000000000000000000001`
 
 Note that some of the functions above contain performance optimizations. So using them is recommended.
 
