@@ -152,7 +152,7 @@ pub fn read_input() {
                 std::process::exit(1);
             });
             let result = apply_algebra_to_tree_node(&tree.root_node, &x, &trees, use_math_tricks);
-            output(format!("{}", trim2(result)));
+            output(trim2(result));
         } else {
             output(format!("Function {func_name} not defined"));
         }
