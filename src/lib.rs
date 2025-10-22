@@ -11,7 +11,7 @@ static NAN: OnceLock<String> = OnceLock::new();
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
 pub enum TreeNode {
     Op(char, Box<TreeNode>, Box<TreeNode>),
-    Num(i32),
+    Num(String),
     Var(String),
     Fun(String, Box<TreeNode>), // TODO: For iterated functions -> Fun(String, usize, Box<TreeNode>). Defaults to 1. f(x) = f^1(x). INFINITY(x) = 10^80. f^INFINITY(x).
     Paren(Box<TreeNode>),
@@ -168,7 +168,7 @@ pub fn apply_algebra_to_tree_node(
     use_math_tricks: bool,
 ) -> Dec {
     match node {
-        TreeNode::Num(n) => Dec::from(*n),
+        TreeNode::Num(n) => n.parse::<Dec>().unwrap(),
         TreeNode::Var(s) => {
             if s == "x" {
                 x.clone()
@@ -387,12 +387,22 @@ fn parse_atomic(tokens: &[char], index: &mut usize) -> TreeNode {
             TreeNode::Paren(Box::new(node))
         }
         '0'..='9' => {
-            let mut num = 0;
-            while *index < tokens.len() && tokens[*index].is_ascii_digit() {
-                num = num * 10 + tokens[*index].to_digit(10).unwrap() as i32;
-                *index += 1;
+            let mut num_str = String::new();
+            let mut found_dot = false;
+            while *index < tokens.len() {
+                let current_char = tokens[*index];
+                if current_char.is_ascii_digit() {
+                    num_str.push(current_char);
+                    *index += 1;
+                } else if current_char == '.' && !found_dot {
+                    num_str.push(current_char);
+                    found_dot = true;
+                    *index += 1;
+                } else {
+                    break;
+                }
             }
-            TreeNode::Num(num)
+            TreeNode::Num(num_str)
         }
         'A'..='Z' | 'a'..='z' => {
             let mut name = String::new();
@@ -566,7 +576,7 @@ mod tests {
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
                     name: "abs".to_string(),
-                    root_node: parse_expression("(x^2)^(1/2)")
+                    root_node: parse_expression("(x^2)^0.5")
                 }],
             },
             TestCase {
