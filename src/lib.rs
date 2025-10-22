@@ -388,18 +388,16 @@ fn parse_atomic(tokens: &[char], index: &mut usize) -> TreeNode {
         }
         '0'..='9' => {
             let mut num_str = String::new();
-            let mut found_dot = false;
-            while *index < tokens.len() {
-                let current_char = tokens[*index];
-                if current_char.is_ascii_digit() {
-                    num_str.push(current_char);
+            while *index < tokens.len() && tokens[*index].is_ascii_digit() {
+                num_str.push(tokens[*index]);
+                *index += 1;
+            }
+            if *index < tokens.len() && tokens[*index] == '.' {
+                num_str.push(tokens[*index]);
+                *index += 1;
+                while *index < tokens.len() && tokens[*index].is_ascii_digit() {
+                    num_str.push(tokens[*index]);
                     *index += 1;
-                } else if current_char == '.' && !found_dot {
-                    num_str.push(current_char);
-                    found_dot = true;
-                    *index += 1;
-                } else {
-                    break;
                 }
             }
             TreeNode::Num(num_str)
