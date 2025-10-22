@@ -31,11 +31,3 @@ pub fn pow(x: Dec, exp: Dec) -> Dec {
         x.powi(exp_str.parse::<i64>().unwrap())
     }
 }
-
-/*
-// TODO
-- Iterierte Funktionen
-- NaN statt panic!.
-- rv64 interpreter bauen. (0.000101010101 + 10000000) * 10^1000 > program && chmod +x program && ./program#
-- frage ist ob man am anfang vom risc-v programm einen unschädlichen befehl packt der als erste ziffer ne 1 hat.
-*/
