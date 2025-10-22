@@ -70,7 +70,7 @@
     <div style="width:100%;height:6vh;"><button style="float:left" onclick="window.location.reload()"><b>RUN &#9654;</b></button> <button onclick="document.location='https://github.com/772/single-variable-algebra-compiler'" style="float:right;background-color:black"><b>Git Repository</b></button></div>
     <div class="container">
       <div class="box box-1"><textarea id="input">
-decimals(x) = 25
+decimals(x) = 50
 abs(x) = (x^2)^(1/2)
 H(x) = (x+abs(x))/(2*x)
 tiny(x) = 10^(-decimals(x))
@@ -88,8 +88,12 @@ is8(x) = is0(x-8)
 is9(x) = is0(x-9)
 floor1(x) = is1(x)+2*is2(x)+3*is3(x)+4*is4(x)+5*is5(x)+6*is6(x)+7*is7(x)+8*is8(x)+9*is9(x)
 right(x) = x*10-floor1(x*10)+floor1(x*10)*tiny(x)
-left(x) = right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(x))))))))))))))))))))))))
-left(0.3000000000000000000000012)
+left(x) = right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(x)))))))))))))))))))))))))))))))))))))))))))))))))
+help_func_3(x) = right(x-is3(x*10)/5)
+help_func_2(x) = help_func_3(help_func_3(help_func_3(help_func_3(help_func_3(x)))))
+help_func_1(x) = help_func_2(help_func_2(help_func_2(help_func_2(help_func_2(x)))))
+replace_any_3_with_1(x) = help_func_1(help_func_1(x))
+replace_any_3_with_1(0.30000554433221100000000003033773333337319378400012)
 </textarea></div>
       <div class="box box-2"><textarea id="output" disabled></textarea></div>
     </div>
