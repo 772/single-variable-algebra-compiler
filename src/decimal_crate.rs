@@ -1,43 +1,41 @@
+// lib.rs should not contain any Decimal-crate-specific code.
+#[allow(unused_imports)]
 #[cfg(target_arch = "wasm32")]
 use web_sys::window;
 
-#[cfg(not(target_arch = "wasm32"))]
-pub const MAX_DECIMAL_PLACES: usize = 100;
-#[cfg(target_arch = "wasm32")]
-pub const MAX_DECIMAL_PLACES: usize = 25;
+pub const MAX_DECIMAL_PLACES: usize = 500; // RUST_BIGDECIMAL_DEFAULT_PRECISION is MAX_DECIMAL_PLACES * 2 + 2.
+pub type Dec = bigdecimal::BigDecimal;
 
-#[cfg(not(target_arch = "wasm32"))]
-pub type Dec = dec::Decimal<MAX_DECIMAL_PLACES>;
-#[cfg(target_arch = "wasm32")]
-pub type Dec = fastnum::decimal::Decimal<MAX_DECIMAL_PLACES>;
-
-#[cfg(not(target_arch = "wasm32"))]
 pub fn zero() -> Dec {
-    Dec::zero()
-}
-#[cfg(target_arch = "wasm32")]
-pub fn zero() -> Dec {
-    Dec::ZERO
+    bigdecimal::Zero::zero()
 }
 
-#[cfg(not(target_arch = "wasm32"))]
-pub fn pow(mut x: Dec, exp: Dec) -> Dec {
-    let mut ctx = dec::Context::<Dec>::default();
-    ctx.set_min_exponent(-1000).unwrap();
-    ctx.set_max_exponent(1000).unwrap();
-    ctx.pow(&mut x, &exp);
-    x
+pub fn dec_to_string(x: Dec) -> String {
+    x.to_plain_string()
 }
-#[cfg(target_arch = "wasm32")]
+
 pub fn pow(x: Dec, exp: Dec) -> Dec {
-    x.pow(exp)
+    let x_str = x.to_string();
+    let exp_str = exp.to_string();
+    if x_str == "0" || x_str == "1" {
+        x
+    } else if exp_str == "0.5" {
+        x.sqrt().unwrap()
+    } else if exp_str.contains('.') {
+        let result: f64 = x_str
+            .parse::<f64>()
+            .unwrap()
+            .powf(exp_str.parse::<f64>().unwrap());
+        bigdecimal::FromPrimitive::from_f64(result).unwrap()
+    } else {
+        x.powi(exp_str.parse::<i64>().unwrap())
+    }
 }
 
-#[cfg(not(target_arch = "wasm32"))]
-pub fn normal_string(x: Dec) -> String {
-    x.to_standard_notation_string()
-}
-#[cfg(target_arch = "wasm32")]
-pub fn normal_string(x: Dec) -> String {
-    x.to_string()
-}
+/*
+// TODO
+- Iterierte Funktionen
+- NaN statt panic!.
+- rv64 interpreter bauen. (0.000101010101 + 10000000) * 10^1000 > program && chmod +x program && ./program#
+- frage ist ob man am anfang vom risc-v programm einen unschädlichen befehl packt der als erste ziffer ne 1 hat.
+*/

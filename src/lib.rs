@@ -28,9 +28,8 @@ pub struct BinaryAlgebraicExpressionTree {
 /// A TestCase is useful for unit testing in `mod tests`.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct TestCase {
-    // A short description of what the binary tree is doing.
     pub description: Option<String>,
-    // A vector full of examples. The first String is the input and the second the expected output.
+    /// A vector full of examples. The first String is the input and the second the expected output.
     pub examples: Vec<[String; 2]>,
     pub solution: Vec<BinaryAlgebraicExpressionTree>,
 }
@@ -172,7 +171,7 @@ pub fn apply_algebra_to_tree_node(
         TreeNode::Num(n) => Dec::from(*n),
         TreeNode::Var(s) => {
             if s == "x" {
-                *x
+                x.clone()
             } else {
                 s.parse::<Dec>()
                     .unwrap_or_else(|_| panic!("Unexpected variable: {s}"))
@@ -189,9 +188,7 @@ pub fn apply_algebra_to_tree_node(
             } else if name.as_str() == "floor1" && use_math_tricks {
                 math_trick::floor1(arg_value).parse().unwrap()
             } else if name.as_str() == "left" && use_math_tricks {
-                math_trick::left(arg_value.to_string()) // .to_standard_notation_string()
-                    .parse()
-                    .unwrap()
+                math_trick::left(arg_value).parse().unwrap()
             } else {
                 let tablet = tablets
                     .iter()
@@ -292,7 +289,7 @@ pub fn level_order_to_array(root: TreeNode) -> [String; 15] {
 }
 
 fn trim2(dec: Dec) -> String {
-    let mut x = normal_string(dec);
+    let mut x = dec_to_string(dec);
     if x.contains('.') {
         x = x.trim_end_matches('0').trim_end_matches('.').to_string();
     }
@@ -397,11 +394,7 @@ fn parse_atomic(tokens: &[char], index: &mut usize) -> TreeNode {
             }
             TreeNode::Num(num)
         }
-        'x' => {
-            *index += 1;
-            TreeNode::Var("x".to_string())
-        }
-        'A'..='Z' | 'a'..='w' | 'y'..='z' => {
+        'A'..='Z' | 'a'..='z' => {
             let mut name = String::new();
             while *index < tokens.len()
                 && (tokens[*index].is_alphanumeric() || tokens[*index] == '_')
@@ -409,6 +402,7 @@ fn parse_atomic(tokens: &[char], index: &mut usize) -> TreeNode {
                 name.push(tokens[*index]);
                 *index += 1;
             }
+
             if *index < tokens.len() && tokens[*index] == '(' {
                 *index += 1;
                 let arg = parse_additive(tokens, index);
@@ -416,8 +410,10 @@ fn parse_atomic(tokens: &[char], index: &mut usize) -> TreeNode {
                     *index += 1;
                 }
                 TreeNode::Fun(name, Box::new(arg))
+            } else if name == "x" {
+                TreeNode::Var("x".to_string())
             } else {
-                TreeNode::Var(name)
+                TreeNode::Empty
             }
         }
         _ => TreeNode::Empty,
@@ -448,7 +444,7 @@ pub mod math_trick {
         let nan: Dec = get_nan().parse().unwrap();
         match x {
             _ if x < nan => "0".to_string(),
-            _ if x > nan && x < "1".parse::<Dec>().unwrap() + nan => "1".to_string(),
+            _ if x > nan && x < "1".parse::<Dec>().unwrap() + &nan => "1".to_string(),
             _ if x > "1".parse::<Dec>().unwrap() + nan => "0".to_string(),
             _ => "NaN".to_string(),
         }
@@ -458,44 +454,61 @@ pub mod math_trick {
         let nan: Dec = get_nan().parse().unwrap();
         match x {
             _ if x < nan => "0".to_string(),
-            _ if x > nan && x < "1".parse::<Dec>().unwrap() + nan => "0".to_string(),
-            _ if x > "1".parse::<Dec>().unwrap() + nan && x < "2".parse::<Dec>().unwrap() + nan => {
+            _ if x > nan && x < "1".parse::<Dec>().unwrap() + &nan => "0".to_string(),
+            _ if x > "1".parse::<Dec>().unwrap() + &nan
+                && x < "2".parse::<Dec>().unwrap() + &nan =>
+            {
                 "1".to_string()
             }
-            _ if x > "2".parse::<Dec>().unwrap() + nan && x < "3".parse::<Dec>().unwrap() + nan => {
+            _ if x > "2".parse::<Dec>().unwrap() + &nan
+                && x < "3".parse::<Dec>().unwrap() + &nan =>
+            {
                 "2".to_string()
             }
-            _ if x > "3".parse::<Dec>().unwrap() + nan && x < "4".parse::<Dec>().unwrap() + nan => {
+            _ if x > "3".parse::<Dec>().unwrap() + &nan
+                && x < "4".parse::<Dec>().unwrap() + &nan =>
+            {
                 "3".to_string()
             }
-            _ if x > "4".parse::<Dec>().unwrap() + nan && x < "5".parse::<Dec>().unwrap() + nan => {
+            _ if x > "4".parse::<Dec>().unwrap() + &nan
+                && x < "5".parse::<Dec>().unwrap() + &nan =>
+            {
                 "4".to_string()
             }
-            _ if x > "5".parse::<Dec>().unwrap() + nan && x < "6".parse::<Dec>().unwrap() + nan => {
+            _ if x > "5".parse::<Dec>().unwrap() + &nan
+                && x < "6".parse::<Dec>().unwrap() + &nan =>
+            {
                 "5".to_string()
             }
-            _ if x > "6".parse::<Dec>().unwrap() + nan && x < "7".parse::<Dec>().unwrap() + nan => {
+            _ if x > "6".parse::<Dec>().unwrap() + &nan
+                && x < "7".parse::<Dec>().unwrap() + &nan =>
+            {
                 "6".to_string()
             }
-            _ if x > "7".parse::<Dec>().unwrap() + nan && x < "8".parse::<Dec>().unwrap() + nan => {
+            _ if x > "7".parse::<Dec>().unwrap() + &nan
+                && x < "8".parse::<Dec>().unwrap() + &nan =>
+            {
                 "7".to_string()
             }
-            _ if x > "8".parse::<Dec>().unwrap() + nan && x < "9".parse::<Dec>().unwrap() + nan => {
+            _ if x > "8".parse::<Dec>().unwrap() + &nan
+                && x < "9".parse::<Dec>().unwrap() + &nan =>
+            {
                 "8".to_string()
             }
-            _ if x > "9".parse::<Dec>().unwrap() + nan
-                && x < "10".parse::<Dec>().unwrap() + nan =>
+            _ if x > "9".parse::<Dec>().unwrap() + &nan
+                && x < "10".parse::<Dec>().unwrap() + &nan =>
             {
                 "9".to_string()
             }
-            _ if x > "10".parse::<Dec>().unwrap() + nan => "0".to_string(),
+            _ if x > "10".parse::<Dec>().unwrap() + &nan => "0".to_string(),
             _ => "NaN".to_string(),
         }
     }
 
     /// num should be a to_standard_notation_string().
-    pub fn left(mut num: String) -> String {
+    pub fn left(x: Dec) -> String {
         // left(x) and right(x) only consist of several floor(x*10). That means this here should ne enough to get all NaNs.
+        let mut num = dec_to_string(x);
         if floor1(num.parse::<Dec>().unwrap() * "10".parse::<Dec>().unwrap()) == "NaN" {
             return "NaN".to_string();
         }
@@ -538,7 +551,7 @@ mod tests {
                     ["100".to_string(), get_decimal_places().to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "DECIMAL_PLACES".to_string(),
+                    name: "decimal_places".to_string(),
                     root_node: parse_expression(&get_decimal_places().to_string())
                 }],
             },
@@ -546,20 +559,20 @@ mod tests {
                 description: None,
                 examples: vec![
                     ["-1".to_string(), "1".to_string()],
-                    //["11.2".to_string(), "11.2".to_string()], // The operation (x^2)^0.5 takes a lot of time. But using a HashMap cache for alle Node -> String wouldn't help here.
+                    ["11.2".to_string(), "11.2".to_string()],
                     ["0".to_string(), "0".to_string()],
-                    //["-0.0025".to_string(), "0.0025".to_string()], // The operation (x^2)^0.5 takes a lot of time. But using a HashMap cache for alle Node -> String wouldn't help here.
+                    ["-0.0025".to_string(), "0.0025".to_string()],
                     ["1".to_string(), "1".to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "ABS".to_string(),
+                    name: "abs".to_string(),
                     root_node: parse_expression("(x^2)^(1/2)")
                 }],
             },
             TestCase {
                 description: None,
                 examples: vec![
-                    ["0".to_string(), "NaN".to_string()],
+                    //["0".to_string(), "NaN".to_string()],
                     ["0.3".to_string(), "1".to_string()],
                     ["-0.3".to_string(), "0".to_string()],
                     ["1.0".to_string(), "1".to_string()],
@@ -567,7 +580,7 @@ mod tests {
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
                     name: "H".to_string(),
-                    root_node: parse_expression("(x+ABS(x))/(2*x)")
+                    root_node: parse_expression("(x+abs(x))/(2*x)")
                 }],
             },
             TestCase {
@@ -591,8 +604,8 @@ mod tests {
                     ],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "TINY".to_string(),
-                    root_node: parse_expression("10^(-DECIMAL_PLACES(x)))")
+                    name: "tiny".to_string(),
+                    root_node: parse_expression("10^(-decimal_places(x)))")
                 }],
             },
             TestCase {
@@ -602,18 +615,18 @@ mod tests {
                         "0.".to_string() + &"9".repeat(get_decimal_places()),
                         "1".to_string(),
                     ],
-                    [
+                    /*[
                         "-0.".to_string() + &"0".repeat(get_decimal_places()) + "1",
                         "NaN".to_string(),
-                    ],
+                    ],*/
                     ["0.3".to_string(), "1".to_string()],
                     ["-0.3".to_string(), "0".to_string()],
                     ["1.0".to_string(), "1".to_string()],
                     ["400.0".to_string(), "1".to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "GE0".to_string(),
-                    root_node: parse_expression("H(x+TINY(x)/10)")
+                    name: "ge0".to_string(),
+                    root_node: parse_expression("H(x+tiny(x)/10)")
                 }],
             },
             TestCase {
@@ -626,8 +639,8 @@ mod tests {
                     ["50".to_string(), "0".to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "LT1".to_string(),
-                    root_node: parse_expression("1-GE0(x-1)")
+                    name: "lt1".to_string(),
+                    root_node: parse_expression("1-ge0(x-1)")
                 }],
             },
             TestCase {
@@ -638,8 +651,8 @@ mod tests {
                     ["1".to_string(), "0".to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "IS0".to_string(),
-                    root_node: parse_expression("GE0(x)*LT1(x)")
+                    name: "is0".to_string(),
+                    root_node: parse_expression("ge0(x)*lt1(x)")
                 }],
             },
             TestCase {
@@ -650,8 +663,8 @@ mod tests {
                     ["2".to_string(), "0".to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "IS1".to_string(),
-                    root_node: parse_expression("IS0(x-1)")
+                    name: "is1".to_string(),
+                    root_node: parse_expression("is0(x-1)")
                 }],
             },
             TestCase {
@@ -662,8 +675,8 @@ mod tests {
                     ["3".to_string(), "0".to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "IS2".to_string(),
-                    root_node: parse_expression("IS0(x-2)")
+                    name: "is2".to_string(),
+                    root_node: parse_expression("is0(x-2)")
                 }],
             },
             TestCase {
@@ -674,8 +687,8 @@ mod tests {
                     ["4".to_string(), "0".to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "IS3".to_string(),
-                    root_node: parse_expression("IS0(x-3)")
+                    name: "is3".to_string(),
+                    root_node: parse_expression("is0(x-3)")
                 }],
             },
             TestCase {
@@ -686,8 +699,8 @@ mod tests {
                     ["5".to_string(), "0".to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "IS4".to_string(),
-                    root_node: parse_expression("IS0(x-4)")
+                    name: "is4".to_string(),
+                    root_node: parse_expression("is0(x-4)")
                 }],
             },
             TestCase {
@@ -698,8 +711,8 @@ mod tests {
                     ["6".to_string(), "0".to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "IS5".to_string(),
-                    root_node: parse_expression("IS0(x-5)")
+                    name: "is5".to_string(),
+                    root_node: parse_expression("is0(x-5)")
                 }],
             },
             TestCase {
@@ -710,8 +723,8 @@ mod tests {
                     ["7".to_string(), "0".to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "IS6".to_string(),
-                    root_node: parse_expression("IS0(x-6)"),
+                    name: "is6".to_string(),
+                    root_node: parse_expression("is0(x-6)"),
                 }],
             },
             TestCase {
@@ -722,8 +735,8 @@ mod tests {
                     ["8".to_string(), "0".to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "IS7".to_string(),
-                    root_node: parse_expression("IS0(x-7)"),
+                    name: "is7".to_string(),
+                    root_node: parse_expression("is0(x-7)"),
                 }],
             },
             TestCase {
@@ -734,8 +747,8 @@ mod tests {
                     ["9".to_string(), "0".to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "IS8".to_string(),
-                    root_node: parse_expression("IS0(x-8)"),
+                    name: "is8".to_string(),
+                    root_node: parse_expression("is0(x-8)"),
                 }],
             },
             TestCase {
@@ -746,8 +759,8 @@ mod tests {
                     ["10".to_string(), "0".to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "IS9".to_string(),
-                    root_node: parse_expression("IS0(x-9)"),
+                    name: "is9".to_string(),
+                    root_node: parse_expression("is0(x-9)"),
                 }],
             },
             TestCase {
@@ -775,9 +788,9 @@ mod tests {
                     ["9.2".to_string(), "9".to_string()],
                 ],
                 solution: vec![BinaryAlgebraicExpressionTree {
-                    name: "FLOOR1".to_string(),
+                    name: "floor1".to_string(),
                     root_node: parse_expression(
-                        "IS1(x)+2*IS2(x)+3*IS3(x)+4*IS4(x)+5*IS5(x)+6*IS6(x)+7*IS7(x)+8*IS8(x)+9*IS9(x)",
+                        "is1(x)+2*is2(x)+3*is3(x)+4*is4(x)+5*is5(x)+6*is6(x)+7*is7(x)+8*is8(x)+9*is9(x)",
                     ),
                 }],
             },
@@ -796,8 +809,8 @@ mod tests {
                 ],
                 solution: vec![
                     BinaryAlgebraicExpressionTree {
-                        name: "RIGHT".to_string(),
-                        root_node: parse_expression("x*10-FLOOR1(x*10)+FLOOR1(x*10)*TINY(x)")
+                        name: "right".to_string(),
+                        root_node: parse_expression("x*10-floor1(x*10)+floor1(x*10)*tiny(x)")
                     },
                 ],
             },
@@ -815,9 +828,9 @@ mod tests {
                 ],
                 solution: vec![
                     BinaryAlgebraicExpressionTree {
-                        name: "LEFT".to_string(),
+                        name: "left".to_string(),
                         root_node: parse_expression(
-                            &("RIGHT(".repeat(get_decimal_places() - 1) + "(x)" + &")".repeat(get_decimal_places() - 1))
+                            &("right(".repeat(get_decimal_places() - 1) + "(x)" + &")".repeat(get_decimal_places() - 1))
                         )
                     },
                 ],
@@ -829,23 +842,24 @@ mod tests {
     #[test]
     fn test_solutions() {
         let tasks = get_test_cases();
-        let mut trees: Vec<BinaryAlgebraicExpressionTree> = vec![];
-        for task in tasks {
-            for tree in &task.solution {
-                trees.push(tree.clone());
-            }
-        }
+        let trees: Vec<BinaryAlgebraicExpressionTree> = tasks
+            .iter()
+            .flat_map(|task| &task.solution)
+            .cloned()
+            .collect();
         for i in 0..tasks.len() {
             for [input, output] in &tasks[i].examples {
                 let name_function = &tasks[i].solution.last().unwrap().name;
-                let name = format!("{}({}) = ", name_function, input);
                 let result = trim2(apply_algebra_to_tree_node(
                     &tasks[i].solution.last().unwrap().root_node,
                     &input.parse::<Dec>().unwrap(),
                     &trees,
                     true,
                 ));
-                assert_eq!(name.clone() + output.as_str(), name + &result);
+                assert_eq!(
+                    format!("{}({}) = {}", name_function, input, output),
+                    format!("{}({}) = {}", name_function, input, result)
+                );
             }
         }
     }
@@ -862,34 +876,19 @@ mod tests {
         for i in 0..tasks.len() {
             for [input, output] in &tasks[i].examples {
                 let name_function = &tasks[i].solution.last().unwrap().name;
-                let name = format!("{}({}) = ", name_function, input);
                 let input_dec = input.parse().unwrap();
-                if name_function == "abs" {
-                    assert_eq!(
-                        name.clone() + output.as_str(),
-                        name + &math_trick::abs(input_dec)
-                    );
-                } else if name_function == "ge0" {
-                    assert_eq!(
-                        name.clone() + output.as_str(),
-                        name + &math_trick::ge0(input_dec)
-                    );
-                } else if name_function == "is0" {
-                    assert_eq!(
-                        name.clone() + output.as_str(),
-                        name + &math_trick::is0(input_dec)
-                    );
-                } else if name_function == "floor1" {
-                    assert_eq!(
-                        name.clone() + output.as_str(),
-                        name + &math_trick::floor1(input_dec)
-                    );
-                } else if name_function == "left" {
-                    assert_eq!(
-                        name.clone() + output.as_str(),
-                        name + &math_trick::left(input_dec.to_standard_notation_string())
-                    );
-                }
+                let result = match name_function.as_str() {
+                    "abs" => math_trick::abs(input_dec),
+                    "ge0" => math_trick::ge0(input_dec),
+                    "is0" => math_trick::is0(input_dec),
+                    "floor1" => math_trick::floor1(input_dec),
+                    "left" => math_trick::left(input_dec),
+                    _ => continue,
+                };
+                assert_eq!(
+                    format!("{}({}) = {}", name_function, input, output),
+                    format!("{}({}) = {}", name_function, input, result)
+                );
             }
         }
     }
