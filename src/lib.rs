@@ -13,7 +13,7 @@ pub enum TreeNode {
     Op(char, Box<TreeNode>, Box<TreeNode>),
     Num(String),
     Var(String),
-    Fun(String, Box<TreeNode>), // TODO: For iterated functions -> Fun(String, usize, Box<TreeNode>). Defaults to 1. f(x) = f^1(x). INFINITY(x) = 10^80. f^INFINITY(x).
+    Fun(String, usize, Box<TreeNode>),
     Paren(Box<TreeNode>),
     Empty,
 }
@@ -177,25 +177,33 @@ pub fn apply_algebra_to_tree_node(
                     .unwrap_or_else(|_| panic!("Unexpected variable: {s}"))
             }
         }
-        TreeNode::Fun(name, arg) => {
-            let arg_value = apply_algebra_to_tree_node(arg, x, tablets, use_math_tricks);
-            if name.as_str() == "abs" && use_math_tricks {
-                math_trick::abs(arg_value).parse().unwrap()
-            } else if name.as_str() == "ge0" && use_math_tricks {
-                math_trick::ge0(arg_value).parse().unwrap()
-            } else if name.as_str() == "is0" && use_math_tricks {
-                math_trick::is0(arg_value).parse().unwrap()
-            } else if name.as_str() == "floor1" && use_math_tricks {
-                math_trick::floor1(arg_value).parse().unwrap()
-            } else if name.as_str() == "left" && use_math_tricks {
-                math_trick::left(arg_value).parse().unwrap()
-            } else {
-                let tablet = tablets
-                    .iter()
-                    .find(|tablet| name == &tablet.name)
-                    .unwrap_or_else(|| panic!("There is no tree called {name}"));
-                apply_algebra_to_tree_node(&tablet.root_node, &arg_value, tablets, use_math_tricks)
+        TreeNode::Fun(name, iterate, arg) => {
+            let mut arg_value = apply_algebra_to_tree_node(arg, x, tablets, use_math_tricks);
+            for _ in 0..*iterate {
+                if name.as_str() == "abs" && use_math_tricks {
+                    arg_value = math_trick::abs(arg_value).parse().unwrap();
+                } else if name.as_str() == "ge0" && use_math_tricks {
+                    arg_value = math_trick::ge0(arg_value).parse().unwrap();
+                } else if name.as_str() == "is0" && use_math_tricks {
+                    arg_value = math_trick::is0(arg_value).parse().unwrap();
+                } else if name.as_str() == "floor1" && use_math_tricks {
+                    arg_value = math_trick::floor1(arg_value).parse().unwrap();
+                } else if name.as_str() == "left" && use_math_tricks {
+                    arg_value = math_trick::left(arg_value).parse().unwrap();
+                } else {
+                    let tablet = tablets
+                        .iter()
+                        .find(|tablet| name == &tablet.name)
+                        .unwrap_or_else(|| panic!("There is no tree called {name}"));
+                    arg_value = apply_algebra_to_tree_node(
+                        &tablet.root_node,
+                        &arg_value,
+                        tablets,
+                        use_math_tricks,
+                    );
+                }
             }
+            arg_value
         }
         TreeNode::Op(op, left, right) => {
             let left_val = apply_algebra_to_tree_node(left, x, tablets, use_math_tricks);
@@ -243,7 +251,13 @@ pub fn create_expression(node: TreeNode) -> String {
             }
             TreeNode::Num(n) => n.to_string(),
             TreeNode::Var(v) => v,
-            TreeNode::Fun(name, arg) => format!("{}({})", name, build_expr(*arg, 0, false)),
+            TreeNode::Fun(name, iterate, arg) => {
+                let mut iterating = "".to_string();
+                if iterate > 1 {
+                    iterating = "^[".to_string() + &iterate.to_string() + "]";
+                }
+                format!("{}{}({})", name, iterating, build_expr(*arg, 0, false))
+            }
             TreeNode::Paren(expr) => {
                 let inner = build_expr(*expr, 0, true);
                 if parent_prec > 0 {
@@ -274,7 +288,7 @@ pub fn level_order_to_array(root: TreeNode) -> [String; 15] {
             }
             TreeNode::Num(n) => result[i] = n.to_string(),
             TreeNode::Var(v) => result[i] = v,
-            TreeNode::Fun(name, arg) => {
+            TreeNode::Fun(name, _iterate, arg) => {
                 result[i] = name;
                 queue.push_back((2 * i + 2, *arg));
             }
@@ -404,11 +418,34 @@ fn parse_atomic(tokens: &[char], index: &mut usize) -> TreeNode {
         }
         'A'..='Z' | 'a'..='z' => {
             let mut name = String::new();
+            let mut iterate: usize = 1;
             while *index < tokens.len()
                 && (tokens[*index].is_alphanumeric() || tokens[*index] == '_')
             {
                 name.push(tokens[*index]);
                 *index += 1;
+            }
+            if *index < tokens.len() && tokens[*index] == '^' {
+                let saved_index = *index;
+                *index += 1;
+                if *index < tokens.len() && tokens[*index] == '[' {
+                    *index += 1;
+                    let mut num_str = String::new();
+                    while *index < tokens.len() && tokens[*index].is_ascii_digit() {
+                        num_str.push(tokens[*index]);
+                        *index += 1;
+                    }
+                    if *index < tokens.len() && tokens[*index] == ']' {
+                        *index += 1;
+                        if let Ok(parsed_iterate) = num_str.parse::<usize>() {
+                            iterate = parsed_iterate;
+                        }
+                    } else {
+                        *index = saved_index;
+                    }
+                } else {
+                    *index = saved_index;
+                }
             }
 
             if *index < tokens.len() && tokens[*index] == '(' {
@@ -417,7 +454,7 @@ fn parse_atomic(tokens: &[char], index: &mut usize) -> TreeNode {
                 if *index < tokens.len() && tokens[*index] == ')' {
                     *index += 1;
                 }
-                TreeNode::Fun(name, Box::new(arg))
+                TreeNode::Fun(name, iterate, Box::new(arg))
             } else if name == "x" {
                 TreeNode::Var("x".to_string())
             } else {
