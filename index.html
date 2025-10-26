@@ -44,9 +44,6 @@
         resize: none;
         padding: 5px;
         font-style: Consolas;
-        overflow-wrap: normal;
-        overflow-x: scroll;
-        white-space: pre;
       }
       button, span {
         background-color: #04AA6D;
@@ -115,7 +112,7 @@
   <button onclick="document.location='https://github.com/772/single-variable-algebra-compiler/blob/main/Turing%20completeness.md'" style="background-color:black"><b>Turing completeness</b></button> -->
   <button onclick="document.location='https://github.com/772/single-variable-algebra-compiler'" style="background-color:black"><b>Git Repository</b></button>
     <div class="container">
-      <div class="box box-1"><textarea id="input">
+      <div class="box box-1"><textarea id="input" style="overflow-wrap: normal;overflow-x: scroll;white-space: pre;">
 decimals(x) = 50
 abs(x) = (x^2)^(1/2)
 H(x) = (x+abs(x))/(2*x)
