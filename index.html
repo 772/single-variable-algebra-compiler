@@ -45,61 +45,19 @@
         padding: 5px;
         font-style: Consolas;
       }
-      button, span {
-        background-color: #04AA6D;
-        border: none;
-        color: white;
-        height: 4vh;
-        padding: 0px 2vh;
-        margin-right: 0.5%;
-        margin-bottom: 1vh;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 2vh;
-        cursor: pointer;
-        border-radius: 0.5vh;
-      }
-      button:hover {
-        color: #eee;
-      }
 	  input {
         font-size: 2vh;
 	  }
     </style>
   </head>
 
-
- <style>
-.dropdown {
-  position: relative;
-}
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f9f9f9;
-  min-width: 200px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-}
-.dropdown-content a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-.dropdown-content a:hover {
-  background-color: #f1f1f1
-}
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-.dropdown:hover .dropbtn {
-  background-color: #3e8e41;
-}
-</style>
-
   <body>
-  <button style="float:left" onclick="window.location.reload()"><b>RUN &#9654;</b></button>
+  <center>
+  <a onclick="window.location.reload()" href="#"><b>RUN &#9654;</b></a> | 
+  For convenience, f(x) = g(g(g(x))) equals f(x) = g^[3](x) |
+  <a href="https://github.com/772/single-variable-algebra-compiler">Git Repository</a>
+  <br>
+  <br>
 	<!-- <div class="dropdown">
 	  <button class="dropbtn">Load&nbsp;example</button>
 	  <div class="dropdown-content">
@@ -108,9 +66,10 @@
 		<a href="#">iterated_function</a>
 	  </div>
 	</div>
-  <button onclick="document.location='https://github.com/772/single-variable-algebra-compiler'" style="background-color:black"><b>For convenience, f(x) = g(g(g(x))) equals f(x) = g^[3](x)</b></button>
+  <button onclick="document.location='https://github.com/772/single-variable-algebra-compiler'" style="background-color:black"><b></b></button>
   <button onclick="document.location='https://github.com/772/single-variable-algebra-compiler/blob/main/Turing%20completeness.md'" style="background-color:black"><b>Turing completeness</b></button> -->
-  <button onclick="document.location='https://github.com/772/single-variable-algebra-compiler'" style="background-color:black"><b>Git Repository</b></button>
+  
+  </center>
     <div class="container">
       <div class="box box-1"><textarea id="input" style="overflow-wrap: normal;overflow-x: scroll;white-space: pre;">
 decimals(x) = 50
