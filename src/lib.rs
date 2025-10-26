@@ -391,22 +391,12 @@ fn parse_multiplicative(tokens: &[char], index: &mut usize) -> TreeNode {
     left
 }
 
-fn parse_power(tokens: &[char], index: &mut usize) -> TreeNode {
-    let mut left = parse_atomic(tokens, index);
-    while *index < tokens.len() && tokens[*index] == '^' {
-        let op = tokens[*index];
-        *index += 1;
-        let right = parse_atomic(tokens, index);
-        left = TreeNode::Op(op, Box::new(left), Box::new(right));
-    }
-    left
-}
-
 fn parse_atomic(tokens: &[char], index: &mut usize) -> TreeNode {
     if *index >= tokens.len() {
         return TreeNode::Empty;
     }
     let c = tokens[*index];
+    
     match c {
         '(' => {
             *index += 1;
@@ -477,8 +467,62 @@ fn parse_atomic(tokens: &[char], index: &mut usize) -> TreeNode {
                 TreeNode::Empty
             }
         }
-        _ => TreeNode::Empty,
+        _ => {
+            *index += 1;
+            TreeNode::Empty
+        }
     }
+}
+
+fn parse_unary(tokens: &[char], index: &mut usize) -> TreeNode {
+    if *index >= tokens.len() {
+        return TreeNode::Empty;
+    }
+    
+    // Check for unary operators: +, -
+    match tokens[*index] {
+        '+' => {
+            *index += 1;
+            parse_unary(tokens, index) // Unary plus, just skip it
+        }
+        '-' => {
+            *index += 1;
+            // Check if this is a negative number
+            if *index < tokens.len() && (tokens[*index].is_ascii_digit() || tokens[*index] == '.') {
+                // Parse as negative number
+                let mut num_str = String::from("-");
+                while *index < tokens.len() && tokens[*index].is_ascii_digit() {
+                    num_str.push(tokens[*index]);
+                    *index += 1;
+                }
+                if *index < tokens.len() && tokens[*index] == '.' {
+                    num_str.push(tokens[*index]);
+                    *index += 1;
+                    while *index < tokens.len() && tokens[*index].is_ascii_digit() {
+                        num_str.push(tokens[*index]);
+                        *index += 1;
+                    }
+                }
+                TreeNode::Num(num_str)
+            } else {
+                // Unary minus operator
+                TreeNode::Op('-', Box::new(TreeNode::Num("0".to_string())), Box::new(parse_unary(tokens, index)))
+            }
+        }
+        _ => parse_atomic(tokens, index),
+    }
+}
+
+// Update parse_power to use parse_unary instead of parse_atomic
+fn parse_power(tokens: &[char], index: &mut usize) -> TreeNode {
+    let mut left = parse_unary(tokens, index);
+    while *index < tokens.len() && tokens[*index] == '^' {
+        let op = tokens[*index];
+        *index += 1;
+        let right = parse_unary(tokens, index);
+        left = TreeNode::Op(op, Box::new(left), Box::new(right));
+    }
+    left
 }
 
 pub mod math_trick {
