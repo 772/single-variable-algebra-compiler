@@ -151,7 +151,7 @@ pub fn read_input() {
                 std::process::exit(1);
             });
             let result = apply_algebra_to_tree_node(&tree.root_node, &x, &trees, use_math_tricks);
-            output(trim2(result));
+            output(trim2(result.unwrap()));
         } else {
             output(format!("Function {func_name} not defined"));
         }
@@ -166,30 +166,32 @@ pub fn apply_algebra_to_tree_node(
     x: &Dec,
     tablets: &Vec<BinaryAlgebraicExpressionTree>,
     use_math_tricks: bool,
-) -> Dec {
+) -> Option<Dec> {
     match node {
-        TreeNode::Num(n) => n.parse::<Dec>().unwrap(),
+        TreeNode::Num(n) => Some(n.parse::<Dec>().unwrap()),
         TreeNode::Var(s) => {
             if s == "x" {
-                x.clone()
+                Some(x.clone())
             } else {
-                s.parse::<Dec>()
-                    .unwrap_or_else(|_| panic!("Unexpected variable: {s}"))
+                Some(
+                    s.parse::<Dec>()
+                        .unwrap_or_else(|_| panic!("Unexpected variable: {s}")),
+                )
             }
         }
         TreeNode::Fun(name, iterate, arg) => {
             let mut arg_value = apply_algebra_to_tree_node(arg, x, tablets, use_math_tricks);
             for _ in 0..*iterate {
                 if name.as_str() == "abs" && use_math_tricks {
-                    arg_value = math_trick::abs(arg_value).parse().unwrap();
+                    arg_value = Some(math_trick::abs(arg_value.unwrap()).parse().unwrap());
                 } else if name.as_str() == "ge0" && use_math_tricks {
-                    arg_value = math_trick::ge0(arg_value).parse().unwrap();
+                    arg_value = Some(math_trick::ge0(arg_value.unwrap()).parse().unwrap());
                 } else if name.as_str() == "is0" && use_math_tricks {
-                    arg_value = math_trick::is0(arg_value).parse().unwrap();
+                    arg_value = Some(math_trick::is0(arg_value.unwrap()).parse().unwrap());
                 } else if name.as_str() == "floor1" && use_math_tricks {
-                    arg_value = math_trick::floor1(arg_value).parse().unwrap();
+                    arg_value = Some(math_trick::floor1(arg_value.unwrap()).parse().unwrap());
                 } else if name.as_str() == "left" && use_math_tricks {
-                    arg_value = math_trick::left(arg_value).parse().unwrap();
+                    arg_value = Some(math_trick::left(arg_value.unwrap()).parse().unwrap());
                 } else {
                     let tablet = tablets
                         .iter()
@@ -197,7 +199,7 @@ pub fn apply_algebra_to_tree_node(
                         .unwrap_or_else(|| panic!("There is no tree called {name}"));
                     arg_value = apply_algebra_to_tree_node(
                         &tablet.root_node,
-                        &arg_value,
+                        &arg_value.unwrap(),
                         tablets,
                         use_math_tricks,
                     );
@@ -209,16 +211,29 @@ pub fn apply_algebra_to_tree_node(
             let left_val = apply_algebra_to_tree_node(left, x, tablets, use_math_tricks);
             let right_val = apply_algebra_to_tree_node(right, x, tablets, use_math_tricks);
             match op {
-                '+' => left_val + right_val,
-                '-' => left_val - right_val,
-                '*' => left_val * right_val,
-                '/' => left_val / right_val,
-                '^' => pow(left_val, right_val),
+                '+' => Some(left_val.unwrap() + right_val.unwrap()),
+                '-' => Some(left_val.unwrap() - right_val.unwrap()),
+                '*' => Some(left_val.unwrap() * right_val.unwrap()),
+                '/' => {
+                    if right_val == Some(zero()) {
+                        return None;
+                    }
+                    Some(left_val.unwrap() / right_val.unwrap())
+                }
+                '^' => {
+                    if ((left_val == Some(zero())) && (right_val <= Some(zero())))
+                        || (left_val < Some(zero())
+                            && right_val.clone().unwrap().to_string().contains('.'))
+                    {
+                        return None;
+                    }
+                    Some(pow(left_val.unwrap(), right_val.unwrap()))
+                }
                 _ => panic!("Unknown operator: {op}"),
             }
         }
         TreeNode::Paren(expr) => apply_algebra_to_tree_node(expr, x, tablets, use_math_tricks),
-        TreeNode::Empty => zero(),
+        TreeNode::Empty => Some(zero()),
     }
 }
 
@@ -895,12 +910,15 @@ mod tests {
         for i in 0..tasks.len() {
             for [input, output] in &tasks[i].examples {
                 let name_function = &tasks[i].solution.last().unwrap().name;
-                let result = trim2(apply_algebra_to_tree_node(
-                    &tasks[i].solution.last().unwrap().root_node,
-                    &input.parse::<Dec>().unwrap(),
-                    &trees,
-                    true,
-                ));
+                let result = trim2(
+                    apply_algebra_to_tree_node(
+                        &tasks[i].solution.last().unwrap().root_node,
+                        &input.parse::<Dec>().unwrap(),
+                        &trees,
+                        true,
+                    )
+                    .unwrap(),
+                );
                 assert_eq!(
                     format!("{}({}) = {}", name_function, input, output),
                     format!("{}({}) = {}", name_function, input, result)
