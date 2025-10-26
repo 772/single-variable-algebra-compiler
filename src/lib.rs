@@ -396,7 +396,7 @@ fn parse_atomic(tokens: &[char], index: &mut usize) -> TreeNode {
         return TreeNode::Empty;
     }
     let c = tokens[*index];
-    
+
     match c {
         '(' => {
             *index += 1;
@@ -478,7 +478,7 @@ fn parse_unary(tokens: &[char], index: &mut usize) -> TreeNode {
     if *index >= tokens.len() {
         return TreeNode::Empty;
     }
-    
+
     // Check for unary operators: +, -
     match tokens[*index] {
         '+' => {
@@ -506,7 +506,11 @@ fn parse_unary(tokens: &[char], index: &mut usize) -> TreeNode {
                 TreeNode::Num(num_str)
             } else {
                 // Unary minus operator
-                TreeNode::Op('-', Box::new(TreeNode::Num("0".to_string())), Box::new(parse_unary(tokens, index)))
+                TreeNode::Op(
+                    '-',
+                    Box::new(TreeNode::Num("0".to_string())),
+                    Box::new(parse_unary(tokens, index)),
+                )
             }
         }
         _ => parse_atomic(tokens, index),
