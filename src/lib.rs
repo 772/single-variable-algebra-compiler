@@ -210,21 +210,21 @@ pub fn apply_algebra_to_tree_node(
         TreeNode::Op(op, left, right) => {
             let left_val = apply_algebra_to_tree_node(left, x, tablets, use_math_tricks);
             let right_val = apply_algebra_to_tree_node(right, x, tablets, use_math_tricks);
+            let left_str = trim2(left_val.clone().unwrap());
+            let right_str = trim2(right_val.clone().unwrap());
             match op {
                 '+' => Some(left_val.unwrap() + right_val.unwrap()),
                 '-' => Some(left_val.unwrap() - right_val.unwrap()),
                 '*' => Some(left_val.unwrap() * right_val.unwrap()),
                 '/' => {
-                    if right_val == Some(zero()) {
+                    if right_str == "0" {
                         return None;
                     }
                     Some(left_val.unwrap() / right_val.unwrap())
                 }
                 '^' => {
-					use bigdecimal::Zero;
-                    if (left_val.clone().unwrap().is_zero() && (right_val <= Some(zero())))
-                        || (left_val < Some(zero())
-                            && right_val.clone().unwrap().to_string().contains('.'))
+                    if (left_str == "0" && (right_val <= Some(zero())))
+                        || (left_val < Some(zero()) && right_str.contains('.'))
                     {
                         return None;
                     }
