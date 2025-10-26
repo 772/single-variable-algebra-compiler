@@ -221,7 +221,8 @@ pub fn apply_algebra_to_tree_node(
                     Some(left_val.unwrap() / right_val.unwrap())
                 }
                 '^' => {
-                    if ((left_val == Some(zero())) && (right_val <= Some(zero())))
+					use bigdecimal::Zero;
+                    if (left_val.clone().unwrap().is_zero() && (right_val <= Some(zero())))
                         || (left_val < Some(zero())
                             && right_val.clone().unwrap().to_string().contains('.'))
                     {
