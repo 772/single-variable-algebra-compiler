@@ -53,7 +53,7 @@
 
   <body>
   <center>
-  <a onclick="window.location.reload()" href="#"><b>RUN &#9654;</b></a> | 
+  <a onclick="window.location.reload()" href="javascript:void(0)"><b>RUN &#9654;</b></a> | 
   For convenience, f(x) = g(g(g(x))) equals f(x) = g^[3](x) |
   Load examples: <a href="javascript:void(0);" onclick="load_example(1)">(Replace)</a>, <a href="javascript:void(0);" onclick="load_example(2)">(Iterated function)</a>, <a href="javascript:void(0);" onclick="load_example(3)">(4-state busy beaver)</a> |
   <a href="https://github.com/772/single-variable-algebra-compiler">Git Repository</a>
@@ -88,67 +88,18 @@ replace_any_3_with_1(0.30000554433221100000000003033773333337319378400012)
       <div class="box box-2"><textarea id="output" disabled></textarea></div>
     </div>
     <script>
-		let example1 = `decimals(x) = 50
-abs(x) = (x^2)^(1/2)
-H(x) = (x+abs(x))/(2*x)
-tiny(x) = 10^(-decimals(x))
-ge0(x) = H(x+tiny(x)/10)
-lt1(x) = 1-ge0(x-1)
-is0(x) = ge0(x)*lt1(x)
-is1(x) = is0(x-1)
-is2(x) = is0(x-2)
-is3(x) = is0(x-3)
-is4(x) = is0(x-4)
-is5(x) = is0(x-5)
-is6(x) = is0(x-6)
-is7(x) = is0(x-7)
-is8(x) = is0(x-8)
-is9(x) = is0(x-9)
-floor1(x) = is1(x)+2*is2(x)+3*is3(x)+4*is4(x)+5*is5(x)+6*is6(x)+7*is7(x)+8*is8(x)+9*is9(x)
-right(x) = x*10-floor1(x*10)+floor1(x*10)*tiny(x)
-left(x) = right^[49](x)
-help_func_1(x) = right(x-is3(x*10)/5)
-replace_any_3_with_1(x) = help_func_1^[50](x)
-replace_any_3_with_1(0.30000554433221100000000003033773333337319378400012)`;
-		let example2 = `f5(x) = x+1
-f4(x) = f5(f5(f5(f5(f5(f5(f5(f5(f5(f5(x))))))))))
-f3(x) = f4(f4(f4(f4(f4(f4(f4(f4(f4(f4(x))))))))))
-f2(x) = f3(f3(f3(f3(f3(f3(f3(f3(f3(f3(x))))))))))
-f1(x) = f2(f2(f2(f2(f2(f2(f2(f2(f2(f2(x))))))))))
-f(x) = f1(f1(f1(f1(f1(f1(f1(f1(f1(f1(x))))))))))
-test_iterated_function(x) = f(x)+f5^[100000](x)
-test_iterated_function(0)`;
-		let example3 = `decimals(x) = 50
-abs(x) = (x^2)^(1/2)
-H(x) = (x+abs(x))/(2*x)
-tiny(x) = 10^(-decimals(x))
-ge0(x) = H(x+tiny(x)/10)
-lt1(x) = 1-ge0(x-1)
-is0(x) = ge0(x)*lt1(x)
-is1(x) = is0(x-1)
-is2(x) = is0(x-2)
-is3(x) = is0(x-3)
-is4(x) = is0(x-4)
-is5(x) = is0(x-5)
-is6(x) = is0(x-6)
-is7(x) = is0(x-7)
-is8(x) = is0(x-8)
-is9(x) = is0(x-9)
-floor1(x) = is1(x)+2*is2(x)+3*is3(x)+4*is4(x)+5*is5(x)+6*is6(x)+7*is7(x)+8*is8(x)+9*is9(x)
-right(x) = x*10-floor1(x*10)+floor1(x*10)*tiny(x)
-left(x) = right^[49](x)
-busy_beaver_4(x) = is0(x)*x+is1(x)*(is0(10*(x-1))*(2+right((x-1+0.1)))+is1(10*(x-1))*(2+left((x-1))))+is2(x)*(is0(10*(x-2))*(1+left((x-2+0.1)))+is1(10*(x-2))*(3+left((x-2-0.1))))+is3(x)*(is0(10*(x-3))*(right((x-3+0.1)))+is1(10*(x-3))*(4+left((x-3))))+is4(x)*(is0(10*(x-4))*(4+right((x-4+0.1)))+is1(10*(x-4))*(1+right((x-4-0.1))))
-f(x) = busy_beaver_4^[107](x)
-f(1)`;
+		let example1 = `1`;
+		let example2 = `2`;
+		let example3 = `3`;
 		function load_example(num) {
 			if (num == 1) {
-				document.getElementById("input").innerHTML = example1;
+				document.getElementById("input").value = example1;
 			}
 			if (num == 2) {
-				document.getElementById("input").innerHTML = example2;
+				document.getElementById("input").value = example2;
 			}
 			if (num == 3) {
-				document.getElementById("input").innerHTML = example3;
+				document.getElementById("input").value = example3;
 			}
 			document.getElementById("output").innerHTML = "";
 		}
