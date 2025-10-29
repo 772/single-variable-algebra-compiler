@@ -1,23 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-	<script>
-		import init from "./wasm.js";
-		init().catch((error) => {
-			if (
-				!error.message.startsWith(
-					"Using exceptions for control flow, don't mind me. This isn't actually an error!",
-				)
-			) {
-				throw error;
-			}
-		});
-		
-		// Macht die Funktion global verfügbar:
-  window.reloadWasm = () => {
-    init().catch(console.error);
-  };
-	</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Single Variable Algebra Playground</title>
@@ -70,7 +53,7 @@
 
   <body>
   <center>
-  <a href="#" onclick="reloadWasm(); return false;">Test</a> - <a onclick="window.location.reload()" href="javascript:void(0);"><b>RUN &#9654;</b></a> | 
+  <a onclick="window.location.reload()" href="javascript:void(0);"><b>RUN &#9654;</b></a> | 
   For convenience, f(x) = g(g(g(x))) equals f(x) = g^[3](x) |
   Examples: <a href="javascript:void(0);" onclick="load_example(1)">Replace</a>, <a href="javascript:void(0);" onclick="load_example(2)">Iterated function</a>, <a href="javascript:void(0);" onclick="load_example(3)">4-state busy beaver</a> |
   <a href="https://github.com/772/single-variable-algebra-compiler">Git Repository</a>
@@ -169,6 +152,20 @@ f(1)`;
 			}
 			document.getElementById("output").value = "";
 		}
+		window.addEventListener('DOMContentLoaded', (event) => {
+			const textarea = document.getElementById('input');
+			const gespeicherterText = localStorage.getItem('textAreaInhalt');
+			if (gespeicherterText) {
+				textarea.value = gespeicherterText;
+			}
+			textarea.addEventListener('input', function() {
+				localStorage.setItem('textAreaInhalt', textarea.value);
+			});
+		});
+		window.addEventListener('beforeunload', function() {
+			const textarea = document.getElementById('input');
+			localStorage.setItem('textAreaInhalt', textarea.value);
+		});
 	</script>
 	<script type="module">
 		import init from "./wasm.js";
@@ -181,11 +178,6 @@ f(1)`;
 				throw error;
 			}
 		});
-		
-		// Macht die Funktion global verfügbar:
-  window.reloadWasm = () => {
-    init().catch(console.error);
-  };
 	</script>
   </body>
 </html>
