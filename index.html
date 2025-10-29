@@ -53,7 +53,7 @@
 
   <body>
   <center>
-  <a href="#" onclick="init(); return false;">Test</a> - <a onclick="window.location.reload()" href="javascript:void(0);"><b>RUN &#9654;</b></a> | 
+  <a href="#" onclick="reloadWasm(); return false;">Test</a> - <a onclick="window.location.reload()" href="javascript:void(0);"><b>RUN &#9654;</b></a> | 
   For convenience, f(x) = g(g(g(x))) equals f(x) = g^[3](x) |
   Examples: <a href="javascript:void(0);" onclick="load_example(1)">Replace</a>, <a href="javascript:void(0);" onclick="load_example(2)">Iterated function</a>, <a href="javascript:void(0);" onclick="load_example(3)">4-state busy beaver</a> |
   <a href="https://github.com/772/single-variable-algebra-compiler">Git Repository</a>
@@ -164,6 +164,11 @@ f(1)`;
 				throw error;
 			}
 		});
+		
+		// Macht die Funktion global verfügbar:
+  window.reloadWasm = () => {
+    init().catch(console.error);
+  };
 	</script>
   </body>
 </html>
