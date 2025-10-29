@@ -1,6 +1,3 @@
-> [!WARNING]
-> The compiler is work in progress.
-
 [![License: GPL3](https://img.shields.io/badge/License-GNU%20GPL-blue)](https://opensource.org/license/gpl-3-0)
 [![Doc](https://docs.rs/single-variable-algebra-compiler/badge.svg)](https://docs.rs/single-variable-algebra-compiler)
 [![Crate](https://img.shields.io/crates/v/single-variable-algebra-compiler.svg)](https://crates.io/crates/single-variable-algebra-compiler)
@@ -14,6 +11,8 @@ A compiler for Single Variable Algebra (SVA) - a minimalist programming language
 - Functions built from these elements
 
 __Yet another programming language?__ No. While not every math expression qualifies as SVA, every valid SVA program is syntactically correct middle school mathematics. This is making it perfect for learning both programming and math concepts.
+
+SVA is likely the first time ever that 'software' like Busy Beaver is written in pure algebra with only one variable.
 
 ## Usage
 
@@ -50,9 +49,9 @@ Output:
 
 `0.2300000000000000000000001`
 
-It is recommended to use the functions mentioned above, as they trigger performance optimizations during runtime. The value of `decimals(x)` is adjustable. The core concept of SVA is that these functions enable Turing-complete programming.
+It is recommended to use the functions mentioned above, as they trigger performance optimizations during runtime. The value of `decimals(x)` is adjustable. The core concept of SVA is that these functions enable (nearly) Turing-complete programming.
 
-## Code examples without using any third-party crate
+## SVA Code examples without using any third-party crate
 
 The following Rust code implements a function called floor8(x) and can be run on the [Rust Playground](https://play.rust-lang.org/):
 
@@ -153,4 +152,5 @@ x = 50000.1             floor8(x) = 50000
 
 ## Trivia
 
-This programming language was designed in years of 2019, 2020 and 2024 by the author of this compiler. He wrote his Master Thesis about this.
+- This programming language was designed in years of 2019, 2020 and 2024 by the author of this compiler. He wrote his Master Thesis about this.
+- There is a lot of room for improvement: Simply renaming functions like left(x) will remove the performance optimization for it. It is planned to have a better expression simplifications in the future.
