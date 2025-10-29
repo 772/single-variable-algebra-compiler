@@ -15,8 +15,8 @@ That allows using functions like ge0(x) to stop recursive functions since a stro
 
 ## Bounded loops
 
-If we don't use "very strongly zero" we can only use iterated functions like f^[10000000000000....000](x).
+If we don't use "very strongly zero" we can only use iterated functions like `f^[10000000000000....000](x)`.
 
-It's important to note that no physical computer can perform, for example, 10^80 iterations, as this exceeds the number of atoms in the observable universe. However, the theoretical definition of Turing completeness requires the capability for unbounded loops, not their practical execution.
+It's important to note that no physical computer can perform, for example, `10^80` iterations, as this exceeds the number of atoms in the observable universe. However, the theoretical definition of Turing completeness requires the capability for unbounded loops, not their practical execution.
 
 On the other hand: When it comes to space, the general opinion is that Laptops and modern hardware are Turing comlete because there is so much RAM to work with.
