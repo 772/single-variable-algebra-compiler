@@ -181,7 +181,7 @@ pub fn apply_algebra_to_tree_node(
         }
         TreeNode::Fun(name, iterate, arg) => {
             let mut arg_value = apply_algebra_to_tree_node(arg, x, tablets, use_math_tricks);
-            let mut old_value = arg_value.clone();
+            /*let mut old_value = arg_value.clone();*/
             for _ in 0..*iterate {
                 if name.as_str() == "abs" && use_math_tricks {
                     arg_value = Some(math_trick::abs(arg_value.unwrap()).parse().unwrap());
@@ -205,10 +205,10 @@ pub fn apply_algebra_to_tree_node(
                         use_math_tricks,
                     );
                 }
-                if arg_value == old_value {
+                /*if arg_value == old_value {
                     break;
                 }
-                old_value = arg_value.clone();
+                old_value = arg_value.clone();*/
             }
             arg_value
         }
