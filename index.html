@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+	<script type="module">
+		import init from "./wasm.js";
+		init().catch((error) => {
+			if (
+				!error.message.startsWith(
+					"Using exceptions for control flow, don't mind me. This isn't actually an error!",
+				)
+			) {
+				throw error;
+			}
+		});
+		
+		// Macht die Funktion global verfügbar:
+  window.reloadWasm = () => {
+    init().catch(console.error);
+  };
+	</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Single Variable Algebra Playground</title>
