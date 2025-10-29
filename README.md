@@ -49,7 +49,7 @@ Output:
 
 `0.2300000000000000000000001`
 
-It is recommended to use the functions mentioned above, as they trigger performance optimizations during runtime. The value of `decimals(x)` is adjustable. The core concept of SVA is that these functions enable (nearly) Turing-complete programming.
+It is recommended to use the functions mentioned above, as they trigger performance optimizations during runtime. The value of `decimals(x)` is adjustable. The core concept of SVA is that these functions enable [nearly](Turing%20completeness.md) Turing-complete programming.
 
 ## SVA Code examples without using any third-party crate
 
