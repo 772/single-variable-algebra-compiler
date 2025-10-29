@@ -55,13 +55,13 @@
   <center>
   <a onclick="window.location.reload()" href="javascript:void(0);"><b>RUN &#9654;</b></a> | 
   For convenience, f(x) = g(g(g(x))) equals f(x) = g^[3](x) |
-  Load examples: <a href="javascript:void(0);" onclick="load_example(1)">(Replace)</a>, <a href="javascript:void(0);" onclick="load_example(2)">(Iterated function)</a>, <a href="javascript:void(0);" onclick="load_example(3)">(4-state busy beaver)</a> |
+  Examples: <a href="javascript:void(0);" onclick="load_example(1)">Replace</a>, <a href="javascript:void(0);" onclick="load_example(2)">Iterated function</a>, <a href="javascript:void(0);" onclick="load_example(3)">4-state busy beaver</a> |
   <a href="https://github.com/772/single-variable-algebra-compiler">Git Repository</a>
   <br>
   <br>
   </center>
     <div class="container">
-      <div class="box box-1"><textarea id="input" style="overflow-wrap: normal;overflow-x: scroll;white-space: pre;" autocomplete="on" name="input">
+      <div class="box box-1"><form><textarea id="input" style="overflow-wrap: normal;overflow-x: scroll;white-space: pre;" autocomplete="on" name="input">
 decimals(x) = 50
 abs(x) = (x^2)^(1/2)
 H(x) = (x+abs(x))/(2*x)
@@ -84,7 +84,7 @@ left(x) = right^[49](x)
 help_func_1(x) = right(x-is3(x*10)/5)
 replace_any_3_with_1(x) = help_func_1^[50](x)
 replace_any_3_with_1(0.30000554433221100000000003033773333337319378400012)
-</textarea></div>
+</textarea></form></div>
       <div class="box box-2"><textarea id="output" disabled></textarea></div>
     </div>
     <script>
