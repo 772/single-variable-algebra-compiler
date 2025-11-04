@@ -25,7 +25,7 @@
     <h2>Single Variable Algebra Playground</h2>
     <p>
         <input type="checkbox" id="checkbox" onclick="checkbox()"> Use Turing machine standard text format (<a href="https://wiki.bbchallenge.org/wiki/Turing_machine#Standard_text_format">syntax</a
-          >). Tape length: <input id="bandLength" onchange="translate_tm_to_sva()" min="1" step="1" type="number" value="50" disabled>
+          >). Tape length: <input id="bandLength" onchange="translate_tm_to_sva()" min="1" max="450" step="1" type="number" value="50" disabled>
         </p>
         <p><input type="text" id="tm" onchange="translate_tm_to_sva()" value="1RB1LB_1LA0LC_1RZ1LD_1RD0RA" disabled /></p>
         <p>Single Variable Algebra (for convenience, f(x) = g(g(g(x))) equals f(x) = g^[3](x)):</p>
