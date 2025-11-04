@@ -1,95 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Single Variable Algebra Playground</title>
     <style>
-      html {
-        margin: 1.4vh;
-        background-color: #eee;
-      }
-      * {
-        margin: 0px;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      .container {
-        display: flex;
-        flex-direction: column;
-        height: 89.8vh;
-      }
-      .box {
-        width: 100%;
-      }
-      .box-1 {
-        flex: 1;
-      }
-      .box-2 {
-        background-color: lightblue;
-        flex: 1;
-      }
-      @media (min-width: 768px) {
-        .container {
-          flex-direction: row;
-        }
-        .box {
-          height: 100%;
-          width: 50%;
-        }
-      }
-      textarea {
-        width: 100%;
-        height: 100%;
-        resize: none;
-        padding: 5px;
-        font-style: Consolas;
-      }
-	  input {
-        font-size: 2vh;
-	  }
+        html {
+            margin: 1.4vh;
+            background-color: #ddd;
+          }
+          input[type="text"], textarea {
+            min-width: 100%;
+            max-width: 100%;
+            font-style: Consolas;
+          }
+          textarea {
+			min-height: 30vh;
+		  }
     </style>
-  </head>
+</head>
 
-  <body>
-  <center>
-  <a onclick="window.location.reload()" href="javascript:void(0);"><b>RUN &#9654;</b></a> | 
-  For convenience, f(x) = g(g(g(x))) equals f(x) = g^[3](x) |
-  Examples: <a href="javascript:void(0);" onclick="load_example(1)">Replace</a>, <a href="javascript:void(0);" onclick="load_example(2)">Iterated function</a>, <a href="javascript:void(0);" onclick="load_example(3)">4-state busy beaver</a> |
-  <a href="https://github.com/772/single-variable-algebra-compiler">Git Repository</a>
-  <br>
-  <br>
-  </center>
-    <div class="container">
-      <div class="box box-1"><textarea id="input" style="overflow-wrap: normal;overflow-x: scroll;white-space: pre;">
-decimals(x) = 50
-abs(x) = (x^2)^(1/2)
-H(x) = (x+abs(x))/(2*x)
-tiny(x) = 10^(-decimals(x))
-ge0(x) = H(x+tiny(x)/10)
-lt1(x) = 1-ge0(x-1)
-is0(x) = ge0(x)*lt1(x)
-is1(x) = is0(x-1)
-is2(x) = is0(x-2)
-is3(x) = is0(x-3)
-is4(x) = is0(x-4)
-is5(x) = is0(x-5)
-is6(x) = is0(x-6)
-is7(x) = is0(x-7)
-is8(x) = is0(x-8)
-is9(x) = is0(x-9)
-floor1(x) = is1(x)+2*is2(x)+3*is3(x)+4*is4(x)+5*is5(x)+6*is6(x)+7*is7(x)+8*is8(x)+9*is9(x)
-right(x) = x*10-floor1(x*10)+floor1(x*10)*tiny(x)
-left(x) = right^[49](x)
-help_func_1(x) = right(x-is3(x*10)/5)
-replace_any_3_with_1(x) = help_func_1^[50](x)
-replace_any_3_with_1(0.30000554433221100000000003033773333337319378400012)
-</textarea></div>
-      <div class="box box-2"><textarea id="output" disabled></textarea></div>
-    </div>
+<body>
+    <h2>Single Variable Algebra Playground</h2>
+    <p>
+        <input type="checkbox" id="checkbox" onclick="checkbox()"> Use Turing machine standard text format (<a href="https://wiki.bbchallenge.org/wiki/Turing_machine#Standard_text_format">syntax</a
+          >). Tape length: <input id="bandLength" onchange="translate_tm_to_sva()" min="1" step="1" type="number" value="50" disabled>
+        </p>
+        <p><input type="text" id="tm" onchange="translate_tm_to_sva()" value="1RB1LB_1LA0LC_1RZ1LD_1RD0RA" disabled /></p>
+        <p>Single Variable Algebra (for convenience, f(x) = g(g(g(x))) equals f(x) = g^[3](x)):</p>
+        <textarea
+          id="sva"
+          style="overflow-wrap: normal; overflow-x: scroll; white-space: pre"
+        ></textarea
+        >
+        <p>
+        <a onclick="window.location.reload()" href="javascript:void(0);"><b>Calculate output &#9654;</b></a>
+    </p>
+    </p>
+    <textarea id="output" disabled></textarea>
+    <p><a href="https://github.com/772/single-variable-algebra-compiler">Git Repository</a
+      ></p>
     <script>
-		let example1 = `decimals(x) = 50
-abs(x) = (x^2)^(1/2)
+      function turing_machine_translate(
+        currentState,
+        write0,
+        action0,
+        newstate0,
+        write1,
+        action1,
+        newstate1,
+      ) {
+        return (
+          "+is" +
+          currentState +
+          "(x)*(is0(10*(x-" +
+          currentState +
+          "))*(" +
+          newstate0 +
+          "+" +
+          action0 +
+          "(x-" +
+          currentState +
+          "+0." +
+          newstate0 +
+          "))+is1(10*(x-" +
+          currentState +
+          "))*(" +
+          newstate1 +
+          "+" +
+          action1 +
+          "(x-" +
+          currentState +
+          "+0." +
+          newstate1 +
+          ")))"
+        );
+      }
+      function translate_tm_to_sva() {
+        let tmString = document.getElementById("tm").value;
+        let algebra = `decimals(x) = `+ Number(document.getElementById("bandLength").value) + `\n` +
+`abs(x) = (x^2)^(1/2)
 H(x) = (x+abs(x))/(2*x)
 tiny(x) = 10^(-decimals(x))
 ge0(x) = H(x+tiny(x)/10)
@@ -106,78 +97,66 @@ is8(x) = is0(x-8)
 is9(x) = is0(x-9)
 floor1(x) = is1(x)+2*is2(x)+3*is3(x)+4*is4(x)+5*is5(x)+6*is6(x)+7*is7(x)+8*is8(x)+9*is9(x)
 right(x) = x*10-floor1(x*10)+floor1(x*10)*tiny(x)
-left(x) = right^[49](x)
-help_func_1(x) = right(x-is3(x*10)/5)
-replace_any_3_with_1(x) = help_func_1^[50](x)
-replace_any_3_with_1(0.30000554433221100000000003033773333337319378400012)`;
-		let example2 = `f5(x) = x+1
-f4(x) = f5(f5(f5(f5(f5(f5(f5(f5(f5(f5(x))))))))))
-f3(x) = f4(f4(f4(f4(f4(f4(f4(f4(f4(f4(x))))))))))
-f2(x) = f3(f3(f3(f3(f3(f3(f3(f3(f3(f3(x))))))))))
-f1(x) = f2(f2(f2(f2(f2(f2(f2(f2(f2(f2(x))))))))))
-f(x) = f1(f1(f1(f1(f1(f1(f1(f1(f1(f1(x))))))))))
-test_iterated_function(x) = f(x)+f5^[100000](x)
-test_iterated_function(0)`;
-		let example3 = `decimals(x) = 50
-abs(x) = (x^2)^(1/2)
-H(x) = (x+abs(x))/(2*x)
-tiny(x) = 10^(-decimals(x))
-ge0(x) = H(x+tiny(x)/10)
-lt1(x) = 1-ge0(x-1)
-is0(x) = ge0(x)*lt1(x)
-is1(x) = is0(x-1)
-is2(x) = is0(x-2)
-is3(x) = is0(x-3)
-is4(x) = is0(x-4)
-is5(x) = is0(x-5)
-is6(x) = is0(x-6)
-is7(x) = is0(x-7)
-is8(x) = is0(x-8)
-is9(x) = is0(x-9)
-floor1(x) = is1(x)+2*is2(x)+3*is3(x)+4*is4(x)+5*is5(x)+6*is6(x)+7*is7(x)+8*is8(x)+9*is9(x)
-right(x) = x*10-floor1(x*10)+floor1(x*10)*tiny(x)
-left(x) = right^[49](x)
-busy_beaver_4(x) = is0(x)*x+is1(x)*(is0(10*(x-1))*(2+right((x-1+0.1)))+is1(10*(x-1))*(2+left((x-1))))+is2(x)*(is0(10*(x-2))*(1+left((x-2+0.1)))+is1(10*(x-2))*(3+left((x-2-0.1))))+is3(x)*(is0(10*(x-3))*(right((x-3+0.1)))+is1(10*(x-3))*(4+left((x-3))))+is4(x)*(is0(10*(x-4))*(4+right((x-4+0.1)))+is1(10*(x-4))*(1+right((x-4-0.1))))
-f(x) = busy_beaver_4^[107](x)
-f(1)`;
-		function load_example(num) {
-			if (num == 1) {
-				document.getElementById("input").value = example1;
-			}
-			if (num == 2) {
-				document.getElementById("input").value = example2;
-			}
-			if (num == 3) {
-				document.getElementById("input").value = example3;
-			}
-			document.getElementById("output").value = "";
+left(x) = right^[` + (Number(document.getElementById("bandLength").value) - 1) + `](x)
+tm(x) = is(0)*x`;
+        const blocks = tmString.split("_");
+        blocks.forEach((block, index) => {
+          const currentState = index + 1;
+          const trans0 = block.substring(0, 3);
+          const write0 = parseInt(trans0[0]);
+          const action0 = trans0[1] == "L" ? "left" : "right";
+          let newstate0 = trans0[2].charCodeAt(0) - 64;
+          newstate0 = newstate0 == 26 ? 0 : newstate0;
+          const trans1 = block.substring(3, 6);
+          const write1 = parseInt(trans1[0]);
+          const action1 = trans1[1] == "L" ? "left" : "right";
+          let newstate1 = trans1[2].charCodeAt(0) - 64;
+          newstate1 = newstate1 == 26 ? 0 : newstate1;
+          algebra += turing_machine_translate(
+            currentState,
+            write0,
+            action0,
+            newstate0,
+            write1,
+            action1,
+            newstate1,
+          );
+        });
+        document.getElementById("sva").value =
+          algebra + "\n" + `f(x) = tm^[1000000](x)\n` + `f(1)`;
+      }
+            function checkbox() {
+    			let checked = document.getElementById("checkbox").checked;
+    			document.getElementById("tm").disabled = !checked;
+    			document.getElementById("bandLength").disabled = !checked;
+    			document.getElementById("sva").disabled = checked;
 		}
-		window.addEventListener('DOMContentLoaded', (event) => {
-			const textarea = document.getElementById('input');
-			const gespeicherterText = localStorage.getItem('textAreaInhalt');
-			if (gespeicherterText) {
-				textarea.value = gespeicherterText;
-			}
-			textarea.addEventListener('input', function() {
-				localStorage.setItem('textAreaInhalt', textarea.value);
-			});
-		});
-		window.addEventListener('beforeunload', function() {
-			const textarea = document.getElementById('input');
-			localStorage.setItem('textAreaInhalt', textarea.value);
-		});
-	</script>
-	<script type="module">
-		import init from "./wasm.js";
-		init().catch((error) => {
-			if (
-				!error.message.startsWith(
-					"Using exceptions for control flow, don't mind me. This isn't actually an error!",
-				)
-			) {
-				throw error;
-			}
-		});
-	</script>
+      window.addEventListener("DOMContentLoaded", (event) => {
+        const textarea = document.getElementById("sva");
+        const gespeicherterText = localStorage.getItem("textAreaInhalt");
+        if (gespeicherterText) {
+          textarea.value = gespeicherterText;
+        }
+        textarea.addEventListener("sva", function () {
+          localStorage.setItem("textAreaInhalt", textarea.value);
+        });
+      });
+      window.addEventListener("beforeunload", function () {
+        const textarea = document.getElementById("sva");
+        localStorage.setItem("textAreaInhalt", textarea.value);
+      });
+    </script>
+    <script type="module">
+      import init from "./wasm.js";
+      init().catch((error) => {
+        if (
+          !error.message.startsWith(
+            "Using exceptions for control flow, don't mind me. This isn't actually an error!",
+          )
+        ) {
+          throw error;
+        }
+      });
+    </script>
   </body>
 </html>

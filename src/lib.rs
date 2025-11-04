@@ -81,7 +81,7 @@ fn read_args() -> Vec<String> {
     let document = window.document().unwrap();
     vec![
         document
-            .get_element_by_id("input")
+            .get_element_by_id("sva")
             .unwrap()
             .dyn_into::<web_sys::HtmlTextAreaElement>()
             .unwrap()

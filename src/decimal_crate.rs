@@ -3,7 +3,7 @@
 #[cfg(target_arch = "wasm32")]
 use web_sys::window;
 
-pub const MAX_DECIMAL_PLACES: usize = 500; // RUST_BIGDECIMAL_DEFAULT_PRECISION is MAX_DECIMAL_PLACES * 2 + 2.
+pub const MAX_DECIMAL_PLACES: usize = 450; // RUST_BIGDECIMAL_DEFAULT_PRECISION is MAX_DECIMAL_PLACES * 2 + 2.
 pub type Dec = bigdecimal::BigDecimal;
 
 pub fn zero() -> Dec {
