@@ -118,6 +118,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
     textarea3.addEventListener("input", function() {
         sessionStorage.setItem("sessionStorage3", textarea3.value);
     });
+	checkbox();
 });
 
 window.addEventListener("beforeunload", function() {
@@ -126,7 +127,6 @@ window.addEventListener("beforeunload", function() {
     sessionStorage.setItem("sessionStorage2", document.getElementById("bandLength").value);
     sessionStorage.setItem("sessionStorage3", document.getElementById("sva").value);
 });
-	checkbox();
 	</script>
   <script type="module">
   let wasmInitialized = false;
