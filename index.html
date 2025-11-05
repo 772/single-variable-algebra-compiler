@@ -86,12 +86,17 @@ tm(x) = is0(x)*x`;
 		document.getElementById("sva").disabled = checked;
 	}
 	window.addEventListener("DOMContentLoaded", (event) => {
+		const textarea0 = document.getElementById("checkbox");
 		const textarea1 = document.getElementById("tm");
 		const textarea2 = document.getElementById("bandLength");
 		const textarea3 = document.getElementById("sva");
+		const savedValue0 = sessionStorage.getItem("sessionStorage0");
 		const savedValue1 = sessionStorage.getItem("sessionStorage1");
 		const savedValue2 = sessionStorage.getItem("sessionStorage2");
 		const savedValue3 = sessionStorage.getItem("sessionStorage3");
+		if(savedValue0) {
+			textarea0.value = savedValue0;
+		}
 		if(savedValue1) {
 			textarea1.value = savedValue1;
 		}
@@ -101,6 +106,9 @@ tm(x) = is0(x)*x`;
 		if(savedValue3) {
 			textarea3.value = savedValue3;
 		}
+		textarea0.addEventListener("checkbox", function() {
+			sessionStorage.setItem("sessionStorage1", textarea1.value);
+		});
 		textarea1.addEventListener("tm", function() {
 			sessionStorage.setItem("sessionStorage1", textarea1.value);
 		});
@@ -112,6 +120,7 @@ tm(x) = is0(x)*x`;
 		});
 	});
 	window.addEventListener("beforeunload", function() {
+		sessionStorage.setItem("sessionStorage0", document.getElementById("checkbox").value);
 		sessionStorage.setItem("sessionStorage1", document.getElementById("tm").value);
 		sessionStorage.setItem("sessionStorage2", document.getElementById("bandLength").value);
 		sessionStorage.setItem("sessionStorage3", document.getElementById("sva").value);
