@@ -122,16 +122,17 @@ tm(x) = is0(x)*x`;
   let wasmInitialized = false;
   
   document.getElementById('loadWasmBtn').addEventListener('click', async () => {
-    /*if (wasmInitialized) {
+    if (wasmInitialized) {
       console.log('WASM bereits geladen');
       return;
-    }*/
+    }
     
     try {
       const { default: init } = await import('./wasm.js');
       await init();
       wasmInitialized = true;
       console.log('WASM erfolgreich geladen');
+      location.reload();
     } catch (error) {
       if (!error.message.startsWith(
         "Using exceptions for control flow, don't mind me. This isn't actually an error!"
