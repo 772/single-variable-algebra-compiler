@@ -104,17 +104,32 @@
 		sessionStorage.setItem("textAreaInhalt", textarea.value);
 	});
 	</script>
-	<script type="module"> import init from "./wasm.js";
-         init().catch((error) => {
-           if (
-             !error.message.startsWith(
-               "Using exceptions for control flow, don't mind me. This isn't actually an error!",
-             )
-           ) {
-             throw error;
-           }
-         });
-      </script>
+<button id="loadWasmBtn">WASM laden</button>
+
+<script type="module">
+  let wasmInitialized = false;
+  
+  document.getElementById('loadWasmBtn').addEventListener('click', async () => {
+    if (wasmInitialized) {
+      console.log('WASM bereits geladen');
+      return;
+    }
+    
+    try {
+      const { default: init } = await import('./wasm.js');
+      await init();
+      wasmInitialized = true;
+      console.log('WASM erfolgreich geladen');
+    } catch (error) {
+      if (!error.message.startsWith(
+        "Using exceptions for control flow, don't mind me. This isn't actually an error!"
+      )) {
+        console.error('Fehler beim Laden des WASM-Moduls:', error);
+        throw error;
+      }
+    }
+  });
+</script>
 </body>
 
 </html>
