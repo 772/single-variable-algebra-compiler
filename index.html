@@ -89,9 +89,11 @@ window.addEventListener("DOMContentLoaded", (event) => {
     const textarea1 = document.getElementById("tm");
     const textarea2 = document.getElementById("bandLength");
     const textarea3 = document.getElementById("sva");
+    const textarea4 = document.getElementById("output");
     const savedValue1 = sessionStorage.getItem("sessionStorage1");
     const savedValue2 = sessionStorage.getItem("sessionStorage2");
     const savedValue3 = sessionStorage.getItem("sessionStorage3");
+    const savedValue4 = sessionStorage.getItem("sessionStorage4");
     if(savedValue1) {
         textarea1.value = savedValue1;
     }
@@ -100,6 +102,9 @@ window.addEventListener("DOMContentLoaded", (event) => {
     }
     if(savedValue3) {
         textarea3.value = savedValue3;
+    }
+    if(savedValue4) {
+        textarea4.value = savedValue4;
     }
     textarea1.addEventListener("input", function() {
         sessionStorage.setItem("sessionStorage1", textarea1.value);
@@ -110,6 +115,9 @@ window.addEventListener("DOMContentLoaded", (event) => {
     textarea3.addEventListener("input", function() {
         sessionStorage.setItem("sessionStorage3", textarea3.value);
     });
+    textarea4.addEventListener("input", function() {
+        sessionStorage.setItem("sessionStorage4", textarea4.value);
+    });
 });
 	checkbox();
 
@@ -117,6 +125,7 @@ window.addEventListener("beforeunload", function() {
     sessionStorage.setItem("sessionStorage1", document.getElementById("tm").value);
     sessionStorage.setItem("sessionStorage2", document.getElementById("bandLength").value);
     sessionStorage.setItem("sessionStorage3", document.getElementById("sva").value);
+    sessionStorage.setItem("sessionStorage4", document.getElementById("output").value);
 });
 	</script>
   <script type="module">
