@@ -84,6 +84,9 @@ tm(x) = is0(x)*x`;
 		document.getElementById("tm").disabled = !checked;
 		document.getElementById("bandLength").disabled = !checked;
 		document.getElementById("sva").disabled = checked;
+		if (checked) {
+			translate_tm_to_sva();
+		}
 	}
 window.addEventListener("DOMContentLoaded", (event) => {
     const textarea1 = document.getElementById("tm");
