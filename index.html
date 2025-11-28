@@ -32,7 +32,26 @@
 	  <input type="text" id="tm" onchange="translate_tm_to_sva()" value="1RB1LB_1LA0LC_1RZ1LD_1RD0RA">
     </div>
 	<p>Single Variable Algebra (for convenience, f(x) = g(g(g(x))) equals f(x) = g^[3](x)):</p>
-	<p><textarea id="sva" style="overflow-wrap: normal; overflow-x: scroll; white-space: pre"></textarea></p>
+	<p><textarea id="sva" style="overflow-wrap: normal; overflow-x: scroll; white-space: pre">decimals(x) = 50
+abs(x) = (x^2)^(1/2)
+H(x) = (x+abs(x))/(2*x)
+tiny(x) = 10^(-decimals(x))
+ge0(x) = H(x+tiny(x)/10)
+lt1(x) = 1-ge0(x-1)
+is0(x) = ge0(x)*lt1(x)
+is1(x) = is0(x-1)
+is2(x) = is0(x-2)
+is3(x) = is0(x-3)
+is4(x) = is0(x-4)
+is5(x) = is0(x-5)
+is6(x) = is0(x-6)
+is7(x) = is0(x-7)
+is8(x) = is0(x-8)
+is9(x) = is0(x-9)
+floor1(x) = is1(x)+2*is2(x)+3*is3(x)+4*is4(x)+5*is5(x)+6*is6(x)+7*is7(x)+8*is8(x)+9*is9(x)
+right(x) = x*10-floor1(x*10)+floor1(x*10)*tiny(x)
+left(x) = right^[49](x)
+tm(x) = is0(x)*x</textarea></p>
 	<p><button id="loadWasmBtn">Calculate output &#9654;</button></p>
 	<p><textarea id="output" disabled></textarea></p>
 	<p><a href="https://github.com/772/single-variable-algebra-compiler">Git Repository</a></p>
