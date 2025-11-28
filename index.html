@@ -26,10 +26,11 @@
 
 <body>
 	<h2>Single Variable Algebra (SVA) Playground</h2>
-	<p>
-		<input type="checkbox" id="checkbox" onclick="checkbox()"> Translate Turing machine standard text format (<a href="https://wiki.bbchallenge.org/wiki/Turing_machine#Standard_text_format">syntax</a>) to SVA. Tape length: <input id="bandLength" onchange="translate_tm_to_sva()" min="15" max="450" step="1" type="number" value="50" disabled>
-	</p>
-	<p><input type="text" id="tm" onchange="translate_tm_to_sva()" value="1RB1LB_1LA0LC_1RZ1LD_1RD0RA" disabled /></p>
+	<p><input type="checkbox" id="checkbox" onclick="checkbox()"> Translate Turing machine standard text format (<a href="https://wiki.bbchallenge.org/wiki/Turing_machine#Standard_text_format">syntax</a>) to SVA.</p>
+	<div id="tm_area">
+	  Tape length: <input id="bandLength" onchange="translate_tm_to_sva()" min="15" max="450" step="1" type="number" value="50"></p>
+	  <input type="text" id="tm" onchange="translate_tm_to_sva()" value="1RB1LB_1LA0LC_1RZ1LD_1RD0RA">
+    </div>
 	<p>Single Variable Algebra (for convenience, f(x) = g(g(g(x))) equals f(x) = g^[3](x)):</p>
 	<p><textarea id="sva" style="overflow-wrap: normal; overflow-x: scroll; white-space: pre"></textarea></p>
 	<p><button id="loadWasmBtn">Calculate output &#9654;</button></p>
@@ -81,10 +82,9 @@ tm(x) = is0(x)*x`;
 
 	function checkbox() {
 		let checked = document.getElementById("checkbox").checked;
-		document.getElementById("tm").disabled = !checked;
-		document.getElementById("bandLength").disabled = !checked;
-		document.getElementById("sva").disabled = checked;
+		document.getElementById("tm_area").style.display = "none";
 		if (checked) {
+			document.getElementById("tm_area").style.display = "block";
 			translate_tm_to_sva();
 		}
 	}
