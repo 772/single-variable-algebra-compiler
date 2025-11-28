@@ -10,9 +10,11 @@ A compiler for Single Variable Algebra (SVA) - a minimalist programming language
 - Basic arithmetic (+, -, *, /, ^)
 - Functions built from these elements
 
-__Yet another programming language?__ No. While not every math expression qualifies as SVA, every valid SVA program is syntactically correct middle school mathematics. This is making it perfect for learning both programming and math concepts.
+__Yet another programming language?__ No. Every valid SVA program is syntactically correct middle school mathematics. This makes it perfect for learning both programming and mathematical concepts.
 
-SVA is likely the first time ever that 'software' like Busy Beaver is written in pure algebra with only one variable.
+But don't let the simple syntax fool you. To demonstrate its underlying power, the [online compiler](https://772.github.io/single-variable-algebra-compiler/) can even transform 10-state Turing machines into pure algebraic expressions with a single variable.
+
+SVA uses the concept of [Accelerated Simulators](https://wiki.bbchallenge.org/wiki/Accelerated_simulator). An Accelerated Simulator is a program that simulates Turing machines much faster than traditional step-by-step simulation. It works through an [Inductive Proof System](https://wiki.bbchallenge.org/wiki/Inductive_Proof_System) that automatically detects and proves transition rules using Mathematical Induction. This allows the simulator to jump ahead multiple steps at once rather than computing each state individually. However, the Accelerated Simulator in the SVA compiler is very limited. It only works when all functions follow these precise patterns to enable significant simulation speedups: Copy all example functions from `decimals(x) = g` to `left(x) = right^[g-1](x)` (using a constant in the square brackets, not an expression).
 
 ## Usage
 
