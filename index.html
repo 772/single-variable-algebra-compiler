@@ -6,32 +6,25 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Single Variable Algebra Playground</title>
 	<style>
-	html {
-		margin: 1.4vh;
-		background-color: #ddd;
-	}
-
+	body, input, button, textarea { background-color: #002; color: white; }
+	input:focus, textarea:focus { outline: none; }
+	#sva { background-color: #311; }
+	#log, #output { background-color: #333; }
+	a { color: #0ff; text-decoration: none; }
+	a:hover { text-decoration: underline; }
 	input[type="text"],
-	textarea {
-		min-width: 100%;
-		max-width: 100%;
-		font-style: Consolas;
-	}
-
-	textarea {
-		min-height: 30vh;
-	}
+	textarea { min-width: 100%; max-width: 100%; font-style: Consolas; }
+	textarea { min-height: 30vh; }
 	</style>
 </head>
 
 <body>
-	<h2>Single Variable Algebra (SVA) Playground</h2>
+	<h2>Single Variable Algebra Playground <button id="loadWasmBtn">RUN &#9654;</button></h2>
 	<p><input type="checkbox" id="checkbox" onclick="checkbox()"> Translate Turing machine standard text format (<a href="https://wiki.bbchallenge.org/wiki/Turing_machine#Standard_text_format">syntax</a>) to SVA.</p>
 	<div id="tm_area">
 	  Tape length: <input id="bandLength" onchange="translate_tm_to_sva()" min="15" max="450" step="1" type="number" value="50"></p>
 	  <input type="text" id="tm" onchange="translate_tm_to_sva()" value="1RB1LB_1LA0LC_1RZ1LD_1RD0RA">
     </div>
-	<p>Single Variable Algebra (for convenience, f(x) = g(g(g(x))) equals f(x) = g^[3](x)):</p>
 	<p><textarea id="sva" style="overflow-wrap: normal; overflow-x: scroll; white-space: pre">decimals(x) = 50
 abs(x) = (x^2)^(1/2)
 H(x) = (x+abs(x))/(2*x)
@@ -51,10 +44,12 @@ is9(x) = is0(x-9)
 floor1(x) = is1(x)+2*is2(x)+3*is3(x)+4*is4(x)+5*is5(x)+6*is6(x)+7*is7(x)+8*is8(x)+9*is9(x)
 right(x) = x*10-floor1(x*10)+floor1(x*10)*tiny(x)
 left(x) = right^[49](x)
-tm(x) = is0(x)*x</textarea></p>
-	<p><button id="loadWasmBtn">Calculate output &#9654;</button></p>
-	<p><textarea id="output" disabled></textarea></p>
-	<p><a href="https://github.com/772/single-variable-algebra-compiler">Git Repository</a></p>
+tm(x) = is0(x)*x</textarea><br>
+	<input id="log" type="text" disabled><br><textarea id="output" disabled></textarea></p>
+    <ul>
+	<li>Single Variable Algebra (for convenience, f(x) = g(g(g(x))) equals f(x) = g^[3](x)):</li>
+	<li><a href="https://github.com/772/single-variable-algebra-compiler">Git Repository</a></li>
+    </ul>
 	<script>
 	function turing_machine_translate(currentState, write0, action0, newstate0, write1, action1, newstate1, ) {
 		return ("+is" + currentState + "(x)*(is0(10*(x-" + currentState + "))*(" + newstate0 + "+" + action0 + "(x-" + currentState + "+0." + write0 + "))+is1(10*(x-" + currentState + "))*(" + newstate1 + "+" + action1 + "(x-" + currentState + "-0.1+0." + write1 + ")))");
@@ -62,6 +57,13 @@ tm(x) = is0(x)*x</textarea></p>
 
 	function translate_tm_to_sva() {
 		let tmString = document.getElementById("tm").value;
+		let amount_of_states = (tmString.match(/_/g) || []).length + 1;
+		let firstSegment = tmString.split('_')[0];
+		let amount_of_symbols = firstSegment ? firstSegment.length / 3 : 0;
+		if (amount_of_states * amount_of_symbols * 3 + amount_of_states - 1 != tmString.length) {
+			document.getElementById("log").value = "Turing machine syntax error.";
+			return;
+		}
 		let algebra = `decimals(x) = ` + Number(document.getElementById("bandLength").value) + `\n` + `abs(x) = (x^2)^(1/2)
 H(x) = (x+abs(x))/(2*x)
 tiny(x) = 10^(-decimals(x))
@@ -97,6 +99,7 @@ tm(x) = is0(x)*x`;
 			algebra += turing_machine_translate(currentState, write0, action0, newstate0, write1, action1, newstate1, );
 		});
 		document.getElementById("sva").value = algebra + "\n" + `f(x) = tm^[10000](x)\n` + `f(1)`;
+		document.getElementById("log").value = "Translated Turing machine to SVA. Found " + amount_of_states + " states using " + amount_of_symbols + " symbols."; 
 	}
 
 	function checkbox() {
@@ -141,7 +144,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
         sessionStorage.setItem("sessionStorage4", textarea4.value);
     });
 });
-	checkbox();
+checkbox();
 
 window.addEventListener("beforeunload", function() {
     sessionStorage.setItem("sessionStorage1", document.getElementById("tm").value);
