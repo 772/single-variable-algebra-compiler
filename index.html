@@ -43,7 +43,9 @@ is9(x) = is0(x-9)
 floor1(x) = is1(x)+2*is2(x)+3*is3(x)+4*is4(x)+5*is5(x)+6*is6(x)+7*is7(x)+8*is8(x)+9*is9(x)
 right(x) = x*10-floor1(x*10)+floor1(x*10)*tiny(x)
 left(x) = right^[49](x)
-tm(x) = is0(x)*x</textarea><br>
+tm(x) = is0(x)*x+is1(x)*(is0(10*(x-1))*(2+right(x-1+0.1))+is1(10*(x-1))*(2+left(x-1-0.1+0.1)))+is2(x)*(is0(10*(x-2))*(1+left(x-2+0.1))+is1(10*(x-2))*(3+left(x-2-0.1+0.0)))+is3(x)*(is0(10*(x-3))*(0+right(x-3+0.1))+is1(10*(x-3))*(4+left(x-3-0.1+0.1)))+is4(x)*(is0(10*(x-4))*(4+right(x-4+0.1))+is1(10*(x-4))*(1+right(x-4-0.1+0.0)))
+f(x) = tm^[10000](x)
+f(1)</textarea><br>
 	<input id="log" type="text" disabled><br><textarea id="output" disabled></textarea></p>
     <ul>
 	<li>Single Variable Algebra (for convenience, f(x) = g(g(g(x))) equals f(x) = g^[3](x)):</li>
