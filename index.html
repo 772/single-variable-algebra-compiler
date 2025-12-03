@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Single Variable Algebra Playground</title>
 	<style>
-	body, input, button, textarea { background-color: #002; color: white; }
+	body, input, button, textarea, select { background-color: #002; color: white; }
 	input:focus, textarea:focus { outline: none; }
 	#sva { background-color: #311; min-height: 42vh; }
 	#log, #output { background-color: #333; }
@@ -18,8 +18,14 @@
 </head>
 
 <body>
-	<h2>Single Variable Algebra Playground <button id="loadWasmBtn">RUN &#9654;</button></h2>
-	<p><input type="checkbox" id="checkbox" onclick="checkbox()"> Translate Turing machine standard text format (<a href="https://wiki.bbchallenge.org/wiki/Turing_machine#Standard_text_format">syntax</a>) to SVA.</p>
+	<h2>Single Variable Algebra Playground <button id="loadWasmBtn">RUN &#9654;</button>
+	<select class="Playground-selectExample js-playgroundToysEl" aria-label="Code examples">
+    <option value="beaver">4-state Busy Beaver</option>
+    <option value="floor">floor function</option>
+    <option value="replace">Replace 1 with 7</option>
+    </select>
+	</h2>
+	<p><input type="checkbox" id="checkbox" onclick="checkbox()"> Translate a 10-symbol space-bounded Turing machine to SVA. Syntax: <a href="https://wiki.bbchallenge.org/wiki/Turing_machine#Standard_text_format">Turing machine standard text format</a>.</p>
 	<div id="tm_area">
 	  Tape length: <input id="bandLength" onchange="translate_tm_to_sva()" min="15" max="450" step="1" type="number" value="50"></p>
 	  <input type="text" id="tm" onchange="translate_tm_to_sva()" value="1RB1LB_1LA0LC_1RZ1LD_1RD0RA">
