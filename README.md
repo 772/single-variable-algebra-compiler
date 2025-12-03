@@ -14,7 +14,7 @@ __Yet another programming language?__ No. Every valid SVA program is syntactical
 
 But don't let the simple syntax fool you. To demonstrate its underlying power, the [online compiler](https://772.github.io/single-variable-algebra-compiler/) can even transform 10-state Turing machines into pure algebraic expressions with a single variable.
 
-SVA uses the concept of [Accelerated Simulators](https://wiki.bbchallenge.org/wiki/Accelerated_simulator). An Accelerated Simulator is a program that simulates Turing machines much faster than traditional step-by-step simulation. It works through an [Inductive Proof System](https://wiki.bbchallenge.org/wiki/Inductive_Proof_System) that automatically detects and proves transition rules using Mathematical Induction. This allows the simulator to jump ahead multiple steps at once rather than computing each state individually. However, the Accelerated Simulator in the SVA compiler is very limited. It only works when all functions follow these precise patterns to enable significant simulation speedups: Copy all example functions from `decimals(x) = g` to `left(x) = right^[g-1](x)` (using a constant in the square brackets, not an expression).
+SVA uses the concept of [Accelerated Simulators](https://wiki.bbchallenge.org/wiki/Accelerated_simulator). An Accelerated Simulator is a program that simulates Turing machines much faster than traditional step-by-step simulation. However, the Accelerated Simulator in the SVA compiler is still very limited. It only works when all functions follow these precise patterns to enable significant simulation speedups: Copy all example functions from `decimals(x) = g` to `left(x) = right^[g-1](x)` (using a constant in the square brackets, not an expression).
 
 ## Usage
 
@@ -24,7 +24,7 @@ Example input:
 
 ```bash
 cargo r -- "
-decimals(x) = 25
+decimals(x) = 50
 abs(x) = (x^2)^(1/2)
 H(x) = (x+abs(x))/(2*x)
 tiny(x) = 10^(-decimals(x))
@@ -42,115 +42,16 @@ is8(x) = is0(x-8)
 is9(x) = is0(x-9)
 floor1(x) = is1(x)+2*is2(x)+3*is3(x)+4*is4(x)+5*is5(x)+6*is6(x)+7*is7(x)+8*is8(x)+9*is9(x)
 right(x) = x*10-floor1(x*10)+floor1(x*10)*tiny(x)
-left(x) = right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(right(x))))))))))))))))))))))))
-left(0.3000000000000000000000012)
+left(x) = right^[49](x)
+tm(x) = is0(x)*x+is1(x)*(is0(10*(x-1))*(2+right(x-1+0.1))+is1(10*(x-1))*(2+left(x-1-0.1+0.1)))+is2(x)*(is0(10*(x-2))*(1+left(x-2+0.1))+is1(10*(x-2))*(3+left(x-2-0.1+0.0)))+is3(x)*(is0(10*(x-3))*(0+right(x-3+0.1))+is1(10*(x-3))*(4+left(x-3-0.1+0.1)))+is4(x)*(is0(10*(x-4))*(4+right(x-4+0.1))+is1(10*(x-4))*(1+right(x-4-0.1+0.0)))
+f(x) = tm^[10000](x)
+f(1)
 "
 ```
 
 Output:
 
-`0.2300000000000000000000001`
-
-It is recommended to use the functions mentioned above, as they trigger performance optimizations during runtime. The value of `decimals(x)` is adjustable. The core concept of SVA is that these functions enable [nearly](Turing%20completeness.md) Turing-complete programming.
-
-## SVA Code examples without using any third-party crate
-
-The following Rust code implements a function called floor8(x) and can be run on the [Rust Playground](https://play.rust-lang.org/):
-
-```rust
-fn h(x: f64) -> f64 {
-    (1.0 + x / (x.powf(2.0)).powf(0.5)) / 2.0
-}
-
-fn ge0(x: f64) -> f64 {
-    h(x + (10.0_f64).powf(-9.0))
-}
-
-fn lt1(x: f64) -> f64 {
-    1.0 - ge0(x - 1.0)
-}
-
-fn is0(x: f64) -> f64 {
-    ge0(x) * lt1(x)
-}
-
-fn is1(x: f64) -> f64 {
-    is0(x - 1.0)
-}
-
-fn is2(x: f64) -> f64 {
-    is0(x - 2.0)
-}
-
-fn is3(x: f64) -> f64 {
-    is0(x - 3.0)
-}
-
-fn is4(x: f64) -> f64 {
-    is0(x - 4.0)
-}
-
-fn is5(x: f64) -> f64 {
-    is0(x - 5.0)
-}
-
-fn is6(x: f64) -> f64 {
-    is0(x - 6.0)
-}
-
-fn is7(x: f64) -> f64 {
-    is0(x - 7.0)
-}
-
-fn is8(x: f64) -> f64 {
-    is0(x - 8.0)
-}
-
-fn is9(x: f64) -> f64 {
-    is0(x - 9.0)
-}
-
-fn floor1(x: f64) -> f64 {
-    is1(x)
-        + is2(x) * 2.0
-        + is3(x) * 3.0
-        + is4(x) * 4.0
-        + is5(x) * 5.0
-        + is6(x) * 6.0
-        + is7(x) * 7.0
-        + is8(x) * 8.0
-        + is9(x) * 9.0
-}
-
-fn floor2(x: f64) -> f64 {
-    floor1(x / 10.0) * 10.0 + floor1(x - floor1(x / 10.0) * 10.0)
-}
-
-fn floor4(x: f64) -> f64 {
-    floor2(x / 10.0_f64.powf(2.0)) * 10.0_f64.powf(2.0)
-        + floor2(x - floor2(x / 10.0_f64.powf(2.0)) * 10.0_f64.powf(2.0))
-}
-
-fn floor8(x: f64) -> f64 {
-    floor4(x / 10.0_f64.powf(4.0)) * 10.0_f64.powf(4.0)
-        + floor4(x - floor4(x / 10.0_f64.powf(4.0)) * 10.0_f64.powf(4.0))
-}
-
-fn main() {
-    for x in [1.45000001, 34.0, 99887766.12378, 50000.1] {
-        println!("x = {:<20}floor8(x) = {:<20}", x, floor8(x),);
-    }
-}
-```
-
-Result:
-
-```
-x = 1.45000001          floor8(x) = 1                   
-x = 34                  floor8(x) = 34                  
-x = 99887766.12378      floor8(x) = 99887766            
-x = 50000.1             floor8(x) = 50000  
-```
+`0.01111111111110000000000000000000000000000000000001`
 
 ## Trivia
 
