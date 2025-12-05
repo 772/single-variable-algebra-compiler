@@ -112,7 +112,29 @@ floor16(1156772000123456.1772731827367126472727728)
 `;
 				break;
 			case 'replace':
-				textarea.value = 'TODO';
+				textarea.value = `decimals(x) = 50
+abs(x) = (x^2)^(1/2)
+H(x) = (x+abs(x))/(2*x)
+tiny(x) = 10^(-decimals(x))
+ge0(x) = H(x+tiny(x)/10)
+lt1(x) = 1-ge0(x-1)
+is0(x) = ge0(x)*lt1(x)
+is1(x) = is0(x-1)
+is2(x) = is0(x-2)
+is3(x) = is0(x-3)
+is4(x) = is0(x-4)
+is5(x) = is0(x-5)
+is6(x) = is0(x-6)
+is7(x) = is0(x-7)
+is8(x) = is0(x-8)
+is9(x) = is0(x-9)
+floor1(x) = is1(x)+2*is2(x)+3*is3(x)+4*is4(x)+5*is5(x)+6*is6(x)+7*is7(x)+8*is8(x)+9*is9(x)
+right(x) = x*10-floor1(x*10)+floor1(x*10)*tiny(x)
+left(x) = right^[49](x)
+replace_1_by_7(x) = right(x+is1(x*10)*0.6)
+f(x) = replace_1_by_7^[50](x)
+f(0.2821011111110111236333746311231819159841234293491)
+`;
 				break;
 			default:
 				textarea.value = '';
