@@ -8,7 +8,7 @@
 	<style>
 	body, input, button, textarea, select { background-color: #002; color: white; }
 	input:focus, textarea:focus { outline: none; }
-	#sva { background-color: #311; min-height: 42vh; }
+	#sva { background-color: #134; min-height: 42vh; }
 	#log, #output { background-color: #333; }
 	a { color: #0ff; text-decoration: none; }
 	a:hover { text-decoration: underline; }
@@ -143,8 +143,8 @@ f(0.2821011111110111236333746311231819159841234293491)
 		document.getElementById("output").value = "";
 	}
 		
-	function turing_machine_translate(currentState, write0, action0, newstate0, write1, action1, newstate1, ) {
-		return ("+is" + currentState + "(x)*(is0(10*(x-" + currentState + "))*(" + newstate0 + "+" + action0 + "(x-" + currentState + "+0." + write0 + "))+is1(10*(x-" + currentState + "))*(" + newstate1 + "+" + action1 + "(x-" + currentState + "-0.1+0." + write1 + ")))");
+	function turing_machine_translate(currentState, write, action, newstate, i) {
+		return "+is" + i + "(10*(x-" + currentState + "))*(" + newstate + "+" + action + "(x-" + currentState +   "-0." + i + "+0." + write + "))"
 	}
 
 	function translate_tm_to_sva() {
@@ -154,6 +154,14 @@ f(0.2821011111110111236333746311231819159841234293491)
 		let amount_of_symbols = firstSegment ? firstSegment.length / 3 : 0;
 		if (amount_of_states * amount_of_symbols * 3 + amount_of_states - 1 != tmString.length) {
 			document.getElementById("log").value = "Turing machine syntax error.";
+			return;
+		}
+		if (amount_of_symbols > 10) {
+			document.getElementById("log").value = "Turing machine has more than 10 symbols.";
+			return;
+		}
+		if (amount_of_states < 2) {
+			document.getElementById("log").value = "Turing machine has no states.";
 			return;
 		}
 		let algebra = `decimals(x) = ` + Number(document.getElementById("bandLength").value) + `\n` + `abs(x) = (x^2)^(1/2)
@@ -178,17 +186,17 @@ tm(x) = is0(x)*x`;
 		const blocks = tmString.split("_");
 		blocks.forEach((block, index) => {
 			const currentState = index + 1;
-			const trans0 = block.substring(0, 3);
-			const write0 = parseInt(trans0[0]);
-			const action0 = trans0[1] == "L" ? "left" : "right";
-			let newstate0 = trans0[2].charCodeAt(0) - 64;
-			newstate0 = newstate0 == 26 ? 0 : newstate0;
-			const trans1 = block.substring(3, 6);
-			const write1 = parseInt(trans1[0]);
-			const action1 = trans1[1] == "L" ? "left" : "right";
-			let newstate1 = trans1[2].charCodeAt(0) - 64;
-			newstate1 = newstate1 == 26 ? 0 : newstate1;
-			algebra += turing_machine_translate(currentState, write0, action0, newstate0, write1, action1, newstate1, );
+			algebra += "+is" + currentState + "(x)*(";
+			for (let i = 0; i < amount_of_symbols; i++) {
+				const trans0 = block.substring(i*3, i*3+3);
+				console.log("transe " + trans0);
+				const write = parseInt(trans0[0]);
+				const action = trans0[1] == "L" ? "left" : "right";
+				let newstate_temp = trans0[2].charCodeAt(0) - 64;
+				const newstate = newstate_temp == 26 ? 0 : newstate_temp;
+				algebra += turing_machine_translate(currentState, write, action, newstate, i);
+			}
+			algebra += ")";
 		});
 		document.getElementById("sva").value = algebra + "\n" + `f(x) = tm^[10000](x)\n` + `f(1)`;
 		document.getElementById("log").value = "Translated Turing machine to SVA. Found " + amount_of_states + " states using " + amount_of_symbols + " symbols."; 
