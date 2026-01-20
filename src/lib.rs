@@ -323,7 +323,7 @@ pub fn level_order_to_array(root: TreeNode) -> [String; 15] {
     result
 }
 
-fn trim2(dec: Dec) -> String {
+pub fn trim2(dec: Dec) -> String {
     let mut x = dec_to_string(dec);
     if x.contains('.') {
         x = x.trim_end_matches('0').trim_end_matches('.').to_string();
