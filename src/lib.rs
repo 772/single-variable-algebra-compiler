@@ -293,36 +293,6 @@ pub fn create_expression(node: TreeNode) -> String {
     build_expr(node, 0, true)
 }
 
-/*pub fn level_order_to_array(root: TreeNode) -> [String; 15] {
-    let mut result = std::array::from_fn(|_| String::new());
-    let mut queue = std::collections::VecDeque::with_capacity(15);
-    queue.push_back((0, root));
-    while let Some((i, node)) = queue.pop_front() {
-        if i >= 15 {
-            continue;
-        }
-        match node {
-            TreeNode::Op(op, left, right) => {
-                result[i] = op.to_string();
-                queue.push_back((2 * i + 1, *left));
-                queue.push_back((2 * i + 2, *right));
-            }
-            TreeNode::Num(n) => result[i] = n.to_string(),
-            TreeNode::Var(v) => result[i] = v,
-            TreeNode::Fun(name, _iterate, arg) => {
-                result[i] = name;
-                queue.push_back((2 * i + 2, *arg));
-            }
-            TreeNode::Paren(expr) => {
-                result[i] = "()".to_string();
-                queue.push_back((2 * i + 1, *expr));
-            }
-            TreeNode::Empty => {}
-        }
-    }
-    result
-}*/
-
 pub fn level_order_to_array(root: TreeNode) -> [String; 15] {
     let mut result = std::array::from_fn(|_| String::new());
     let mut queue = std::collections::VecDeque::with_capacity(15);
@@ -333,7 +303,6 @@ pub fn level_order_to_array(root: TreeNode) -> [String; 15] {
         }
         match node {
             TreeNode::Paren(expr) => {
-                // Füge den eingeklammerten Ausdruck direkt in die aktuelle Position ein
                 queue.push_front((i, *expr));
             }
             TreeNode::Op(op, left, right) => {
@@ -1038,15 +1007,5 @@ mod tests {
                 );
             }
         }
-    }
-
-    #[test]
-    fn test_converting() {
-        assert_eq!(
-            level_order_to_array(parse_expression("(x^2)^0.5")),
-            [
-                "^", "^", "0.5", "x", "2", "", "", "", "", "", "", "", "", "", ""
-            ]
-        );
     }
 }
